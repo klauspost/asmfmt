@@ -10,12 +10,15 @@ To install the standalone formatter,
 
 There are also replacements for `gofmt`, `goimports` and `goreturns`, which will process `.s` files alongside your go files when formatting a package.
 
-Toy can choose which to install:
+You can choose which to install:
 ```
 go get -u github.com/klauspost/asmfmt/cmd/gofmt/...
 go get -u github.com/klauspost/asmfmt/cmd/goimports/...
 go get -u github.com/klauspost/asmfmt/cmd/goreturns/...
 ```
+
+Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler files as well.
+
 
 # usage
 
