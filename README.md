@@ -78,6 +78,5 @@ You should only run `asmfmt` on files that are assembler files. Assembler files 
 * There is always a space between paramters.
 * Macros in the same file are tracked, and not included in parameter indentation.
 * `TEXT`, `DATA` and `GLOBL` and labels are level 0 indentation.
+* Aligns `\` in multiline macros.
 
-TODO:
-* Align `\` in multiline macros.

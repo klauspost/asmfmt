@@ -1873,47 +1873,47 @@ TEXT p256SqrInternal(SB), NOSPLIT, $0
 	RET
 
 // ---------------------------------------
-#define p256MulBy2Inline\
-	XORQ    mul0, mul0;\
-	ADDQ    acc4, acc4;\
-	ADCQ    acc5, acc5;\
-	ADCQ    acc6, acc6;\
-	ADCQ    acc7, acc7;\
-	ADCQ    $0, mul0;\
-	MOVQ    acc4, t0;\
-	MOVQ    acc5, t1;\
-	MOVQ    acc6, t2;\
-	MOVQ    acc7, t3;\
-	SUBQ    $-1, t0;\
-	SBBQ    p256const0<>(SB), t1;\
-	SBBQ    $0, t2;\
-	SBBQ    p256const1<>(SB), t3;\
-	SBBQ    $0, mul0;\
-	CMOVQCS acc4, t0;\
-	CMOVQCS acc5, t1;\
-	CMOVQCS acc6, t2;\
+#define p256MulBy2Inline  \
+	XORQ    mul0, mul0;           \
+	ADDQ    acc4, acc4;           \
+	ADCQ    acc5, acc5;           \
+	ADCQ    acc6, acc6;           \
+	ADCQ    acc7, acc7;           \
+	ADCQ    $0, mul0;             \
+	MOVQ    acc4, t0;             \
+	MOVQ    acc5, t1;             \
+	MOVQ    acc6, t2;             \
+	MOVQ    acc7, t3;             \
+	SUBQ    $-1, t0;              \
+	SBBQ    p256const0<>(SB), t1; \
+	SBBQ    $0, t2;               \
+	SBBQ    p256const1<>(SB), t3; \
+	SBBQ    $0, mul0;             \
+	CMOVQCS acc4, t0;             \
+	CMOVQCS acc5, t1;             \
+	CMOVQCS acc6, t2;             \
 	CMOVQCS acc7, t3
 
 	// ---------------------------------------
-#define p256AddInline \
-	XORQ    mul0, mul0;\
-	ADDQ    t0, acc4;\
-	ADCQ    t1, acc5;\
-	ADCQ    t2, acc6;\
-	ADCQ    t3, acc7;\
-	ADCQ    $0, mul0;\
-	MOVQ    acc4, t0;\
-	MOVQ    acc5, t1;\
-	MOVQ    acc6, t2;\
-	MOVQ    acc7, t3;\
-	SUBQ    $-1, t0;\
-	SBBQ    p256const0<>(SB), t1;\
-	SBBQ    $0, t2;\
-	SBBQ    p256const1<>(SB), t3;\
-	SBBQ    $0, mul0;\
-	CMOVQCS acc4, t0;\
-	CMOVQCS acc5, t1;\
-	CMOVQCS acc6, t2;\
+#define p256AddInline  \
+	XORQ    mul0, mul0;           \
+	ADDQ    t0, acc4;             \
+	ADCQ    t1, acc5;             \
+	ADCQ    t2, acc6;             \
+	ADCQ    t3, acc7;             \
+	ADCQ    $0, mul0;             \
+	MOVQ    acc4, t0;             \
+	MOVQ    acc5, t1;             \
+	MOVQ    acc6, t2;             \
+	MOVQ    acc7, t3;             \
+	SUBQ    $-1, t0;              \
+	SBBQ    p256const0<>(SB), t1; \
+	SBBQ    $0, t2;               \
+	SBBQ    p256const1<>(SB), t3; \
+	SBBQ    $0, mul0;             \
+	CMOVQCS acc4, t0;             \
+	CMOVQCS acc5, t1;             \
+	CMOVQCS acc6, t2;             \
 	CMOVQCS acc7, t3
 
 	// ---------------------------------------

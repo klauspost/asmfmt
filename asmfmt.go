@@ -40,25 +40,26 @@ func Format(in io.Reader) ([]byte, error) {
 }
 
 type fstate struct {
-	out            *bytes.Buffer
-	insideBlock    bool // Block comment
-	indentation    int  // Indentation level
-	lastEmpty      bool
-	lastComment    bool
-	lastLabel      bool
-	anyContents    bool
-	inContinuation bool // Inside a multiline statement
-	queued         []statement
-	defines        map[string]struct{}
+	out         *bytes.Buffer
+	insideBlock bool // Block comment
+	indentation int  // Indentation level
+	lastEmpty   bool
+	lastComment bool
+	lastLabel   bool
+	anyContents bool
+	queued      []statement
+	defines     map[string]struct{}
 }
 
 type statement struct {
 	instruction string
-	params      []string
-	comment     string // Without slashes
-	function    bool   // Probably define call
+	params      []string // Parameters
+	comment     string   // Without slashes
+	function    bool     // Probably define call
+	continued   bool     // Multiline statement, continues on next line
 }
 
+// Add a new input line.
 func (f *fstate) addLine(b []byte) error {
 	s := string(b)
 	s = strings.TrimSpace(s)
@@ -124,6 +125,7 @@ func (f *fstate) addLine(b []byte) error {
 		// Comments inside multiline defines.
 		if strings.HasSuffix(s, `\`) {
 			f.indent()
+			s = strings.TrimSpace(strings.TrimSuffix(s, `\`)) + ` \`
 		}
 
 		// Otherwise output
@@ -258,6 +260,7 @@ func (f *fstate) addLine(b []byte) error {
 	return nil
 }
 
+// indent the current line with current indentation.
 func (f *fstate) indent() error {
 	for i := 0; i < f.indentation; i++ {
 		err := f.out.WriteByte('\t')
@@ -268,6 +271,7 @@ func (f *fstate) indent() error {
 	return nil
 }
 
+// flush any queued commands
 func (f *fstate) flush() error {
 	s := formatStatements(f.queued)
 	for _, line := range s {
@@ -293,6 +297,7 @@ func (f *fstate) newLine() error {
 	return nil
 }
 
+// newStatement will parse a line and return it as a statement.
 func newStatement(s string, defs map[string]struct{}) *statement {
 	s = strings.TrimSpace(s)
 
@@ -317,8 +322,8 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 			st.function = true
 		}
 	}
-	// We may not have it defined, if defined in an external
-	// .h file, so try to detect the remaining ones.
+	// We may not have it defined as a macro, if defined in an external
+	// .h file, so we try to detect the remaining ones.
 	if strings.Contains(st.instruction, "(") {
 		st.function = true
 	}
@@ -344,7 +349,25 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 	// Remove trailing ;
 	if len(st.params) > 0 {
 		st.params[len(st.params)-1] = strings.TrimSuffix(st.params[len(st.params)-1], ";")
+	} else {
+		st.instruction = strings.TrimSuffix(st.instruction, ";")
 	}
+
+	// Register line continuations.
+	if len(st.params) > 0 {
+		p := st.params[len(st.params)-1]
+		if st.willContinue() {
+			p = strings.TrimSuffix(st.params[len(st.params)-1], `\`)
+			p = strings.TrimSpace(p)
+			if len(p) > 0 {
+				st.params[len(st.params)-1] = p
+			} else {
+				st.params = st.params[:len(st.params)-1]
+			}
+			st.continued = true
+		}
+	}
+
 	return &st
 }
 
@@ -361,6 +384,8 @@ func (st statement) isPreProcessor() bool {
 	return strings.HasPrefix(st.instruction, "#")
 }
 
+// isGlobal returns true if the current instruction is
+// a global. Currently that is DATA and GLOBL
 func (st statement) isGlobal() bool {
 	up := strings.ToUpper(st.instruction)
 	return up == "DATA" || up == "GLOBL"
@@ -371,23 +396,32 @@ func (st statement) isTEXT() bool {
 	return up == "TEXT" || up == "DATA" || up == "GLOBL"
 }
 
+// We attempt to identify "terminators", after which
+// indentation is likely to be level 0.
 func (st statement) isTerminator() bool {
 	up := strings.ToUpper(st.instruction)
 	return up == "RET" || up == "JMP"
 }
 
+// Detects commands based on case.
 func (st statement) isCommand() bool {
 	up := strings.ToUpper(st.instruction)
 	return up == st.instruction
 }
 
+// Detect if last character is '\', indicating a multiline statement.
 func (st statement) willContinue() bool {
+	if st.continued {
+		return true
+	}
 	if len(st.params) == 0 {
 		return false
 	}
 	return strings.HasSuffix(st.params[len(st.params)-1], `\`)
 }
 
+// define returns the macro defined in this line.
+// if none is defined "" is returned.
 func (st statement) define() string {
 	if st.instruction == "#define" && len(st.params) > 0 {
 		r := strings.TrimSpace(strings.Split(st.params[0], "(")[0])
@@ -397,10 +431,13 @@ func (st statement) define() string {
 	return ""
 }
 
+// formatStatements will format a slice of statements and return each line
+// as a separate string.
 func formatStatements(s []statement) []string {
 	res := make([]string, len(s))
 	maxParam := 0
 	maxInstr := 0
+	maxComm := 0
 	for _, x := range s {
 		l := len([]rune(x.instruction)) + 1 // Instruction length
 		// Ignore length if we are a define "function"
@@ -415,6 +452,11 @@ func formatStatements(s []statement) []string {
 		l++
 		if l > maxParam {
 			maxParam = l
+		}
+		// Add comment (for line continuations)
+		l += len([]rune(x.comment))
+		if l > maxComm {
+			maxComm = l
 		}
 	}
 
@@ -433,6 +475,13 @@ func formatStatements(s []statement) []string {
 				r = r + " "
 			}
 			r += fmt.Sprintf("// %s", x.comment)
+		}
+		if x.continued {
+			it := maxComm - len([]rune(r)) + maxInstr
+			for i := 0; i < it; i++ {
+				r = r + " "
+			}
+			r += `\`
 		}
 		res[i] = r
 	}
