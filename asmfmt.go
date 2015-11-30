@@ -163,9 +163,6 @@ func (f *fstate) addLine(b []byte) error {
 	// Comment only line.
 	if strings.HasPrefix(s, "//") {
 		s = strings.TrimPrefix(s, "//")
-		if strings.HasPrefix(s, " ") {
-			s = s[1:]
-		}
 
 		err := f.flush()
 		if err != nil {
@@ -181,8 +178,14 @@ func (f *fstate) addLine(b []byte) error {
 		if err != nil {
 			return err
 		}
-		if len(s) > 0 {
-			_, err = fmt.Fprintln(f.out, "//", s)
+		
+		// Preserve whitespace if the first after the comment
+		// is a whitespace
+		ts := strings.TrimSpace(s)
+		if ts != s && len(ts) > 0 {
+			_, err = fmt.Fprintln(f.out, "//"+s)
+		} else if len(ts) > 0 {
+			_, err = fmt.Fprintln(f.out, "//",s)
 		} else {
 			_, err = fmt.Fprintln(f.out, "//")
 		}

@@ -434,11 +434,11 @@ CALLFN(·call1073741824, 1073741824)
 
 // bool cas(int32 *val, int32 old, int32 new)
 // Atomically:
-// 	if(*val == old){
-// 		*val = new;
-// 		return 1;
-// 	} else
-// 		return 0;
+//	if(*val == old){
+//		*val = new;
+//		return 1;
+//	} else
+//		return 0;
 TEXT runtime·cas(SB), NOSPLIT, $0-17
 	MOVQ     ptr+0(FP), BX
 	MOVL     old+8(FP), AX
@@ -455,12 +455,12 @@ TEXT runtime·cas(SB), NOSPLIT, $0-17
 
 // bool	runtime·cas64(uint64 *val, uint64 old, uint64 new)
 // Atomically:
-// 	if(*val == *old){
-// 		*val = new;
-// 		return 1;
-// 	} else {
-// 		return 0;
-// 	}
+//	if(*val == *old){
+//		*val = new;
+//		return 1;
+//	} else {
+//		return 0;
+//	}
 TEXT runtime·cas64(SB), NOSPLIT, $0-25
 	MOVQ     ptr+0(FP), BX
 	MOVQ     old+8(FP), AX
@@ -491,11 +491,11 @@ TEXT runtime·atomicstoreuintptr(SB), NOSPLIT, $0-16
 
 // bool casp(void **val, void *old, void *new)
 // Atomically:
-// 	if(*val == old){
-// 		*val = new;
-// 		return 1;
-// 	} else
-// 		return 0;
+//	if(*val == old){
+//		*val = new;
+//		return 1;
+//	} else
+//		return 0;
 TEXT runtime·casp(SB), NOSPLIT, $0-25
 	MOVQ     ptr+0(FP), BX
 	MOVQ     old+8(FP), AX
@@ -512,8 +512,8 @@ TEXT runtime·casp(SB), NOSPLIT, $0-25
 
 // uint32 xadd(uint32 volatile *val, int32 delta)
 // Atomically:
-// 	*val += delta;
-// 	return *val;
+//	*val += delta;
+//	return *val;
 TEXT runtime·xadd(SB), NOSPLIT, $0-20
 	MOVQ  ptr+0(FP), BX
 	MOVL  delta+8(FP), AX

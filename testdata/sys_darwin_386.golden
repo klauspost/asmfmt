@@ -147,7 +147,7 @@ timeloop:
 	JNE   timeloop
 
 	// Gathered all the data we need. Compute time.
-	// 	((tsc - nt_tsc_base) * nt_scale) >> 32 + nt_ns_base - gtod_ns_base + gtod_sec_base*1e9
+	//	((tsc - nt_tsc_base) * nt_scale) >> 32 + nt_ns_base - gtod_ns_base + gtod_sec_base*1e9
 	// The multiply and shift extracts the top 64 bits of the 96-bit product.
 	SUBL 0(SP), AX // DX:AX = (tsc - nt_tsc_base)
 	SBBL 4(SP), DX
@@ -235,12 +235,12 @@ TEXT runtime·sigaction(SB), NOSPLIT, $0
 
 // Sigtramp's job is to call the actual signal handler.
 // It is called with the following arguments on the stack:
-// 	0(FP)	"return address" - ignored
-// 	4(FP)	actual handler
-// 	8(FP)	signal number
-// 	12(FP)	siginfo style
-// 	16(FP)	siginfo
-// 	20(FP)	context
+//	0(FP)	"return address" - ignored
+//	4(FP)	actual handler
+//	8(FP)	signal number
+//	12(FP)	siginfo style
+//	16(FP)	siginfo
+//	20(FP)	context
 TEXT runtime·sigtramp(SB), NOSPLIT, $40
 	get_tls(CX)
 
@@ -345,13 +345,13 @@ TEXT runtime·bsdthread_create(SB), NOSPLIT, $32
 // The thread that bsdthread_create creates starts executing here,
 // because we registered this function using bsdthread_register
 // at startup.
-// 	AX = "pthread" (= g)
-// 	BX = mach thread port
-// 	CX = "func" (= fn)
-// 	DX = "arg" (= m)
-// 	DI = stack top
-// 	SI = flags (= 0x1000000)
-// 	SP = stack - C_32_STK_ALIGN
+//	AX = "pthread" (= g)
+//	BX = mach thread port
+//	CX = "func" (= fn)
+//	DX = "arg" (= m)
+//	DI = stack top
+//	SI = flags (= 0x1000000)
+//	SP = stack - C_32_STK_ALIGN
 TEXT runtime·bsdthread_start(SB), NOSPLIT, $0
 	// set up ldt 7+id to point at m->tls.
 	// m->tls is at m+40.  newosproc left
