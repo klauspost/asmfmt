@@ -12,9 +12,11 @@ This will format your assembler code in a similar way that `gofmt` formats your 
 
 See [Example](http://www.diff-online.com/view/565c48ccabd81).
 
+Status: Beta. The format will still change, and there may unknown cases where the formatting mangles the output. Please report any feedback in the issue section.
+
 # install
 
-To install the standalone formatter, 
+To install the standalone formatter,
 `go get -u github.com/klauspost/asmfmt/cmd/asmfmt`
 
 There are also replacements for `gofmt`, `goimports` and `goreturns`, which will process `.s` files alongside your go files when formatting a package.
@@ -33,7 +35,7 @@ Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler fil
 
 `asmfmt [flags] [path ...]`
 
-The flags are similar to `gofmt`:
+The flags are similar to `gofmt`, except it will only process `.s` files:
 ```
 	-d
 		Do not print reformatted sources to standard output.
@@ -50,19 +52,23 @@ The flags are similar to `gofmt`:
 		If a file's formatting is different from asmfmt's, overwrite it
 		with asmfmt's version.
 ```
+You should only run `asmfmt` on files that are assembler files. Assembler files cannot be positively identified, so it will mangle non-assembler files.
 
 # formatting
 
+* Automatic indentation.
 * It uses tabs for indentation and blanks for alignment.
 * It will remove trailing whitespace.
 * It will align the first parameter.
 * It will align all comments in a block.
 * It will eliminate multiple black lines.
+* Forced newline before comments, except when preceeded by label or another comment.
+* Forced newline before labels, except when preceeded by comment.
+* Retains block breaks (newline between blocks).
 * It will convert single line block comments to line comments.
-* Automatic indentation.
-* Line comments have a space after `//`.
+* Line comments have a space after `//`, except if comment starts with `+`.
 * There is always a space between paramters.
-* Macros are tracked.
+* Macros in the same file are tracked, and not included in parameter indentation.
 * `TEXT`, `DATA` and `GLOBL` and labels are level 0 indentation.
 
 TODO:
