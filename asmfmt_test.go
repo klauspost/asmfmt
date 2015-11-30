@@ -18,7 +18,7 @@ func init() {
 }
 
 func runTest(t *testing.T, in, out string) {
-f, err := os.Open(in)
+	f, err := os.Open(in)
 	if err != nil {
 		t.Error(err)
 		return
@@ -32,10 +32,13 @@ f, err := os.Open(in)
 	}
 
 	expected, err := ioutil.ReadFile(out)
-	if err != nil  && !*update {
+	if err != nil && !*update {
 		t.Error(out, "-", err)
 		return
 	}
+
+	// Convert expected file to LF in case someone did it for us.
+	expected = []byte(strings.Replace(string(expected), "\r\n", "\n", -1))
 
 	if !bytes.Equal(got, expected) {
 		if *update {
@@ -117,7 +120,7 @@ func diff(b1, b2 []byte) (data []byte, err error) {
 
 // Go files must fail.
 func TestGoFile(t *testing.T) {
-	input :=`package main
+	input := `package main
 
 	func main() {
 	}
