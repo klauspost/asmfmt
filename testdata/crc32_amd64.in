@@ -9,7 +9,7 @@
 TEXT ·castagnoliSSE42(SB),NOSPLIT,$0
 	MOVL crc+0(FP), AX  // CRC value
 	MOVQ p+8(FP), SI  // data pointer
-	MOVQ p_len+16(FP), CX  // len(p)
+	MOVQ p_len+16(FP), CX;  // len(p)
 
 	NOTL AX
 

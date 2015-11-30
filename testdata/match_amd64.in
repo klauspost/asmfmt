@@ -1,0 +1,344 @@
+//+build !noasm !appengine
+
+
+// func find4SSE4(needle, haystack []byte, dst []uint16)
+TEXT ·find4SSE4(SB), 7, $0
+    MOVQ    needle+0(FP),R8             // R8: &needle
+    MOVQ    haystack+24(FP),SI          // SI: &haystack
+    MOVQ    haystack_len+32(FP), R10    // R10: len(haystack)
+    MOVQ    dst+48(FP),DX               // DX: &dst
+    MOVD    (R8), X0                    // X0: needle
+    PXOR    X4, X4                      // X4: Zero
+    SHRQ   $4, R10                      // len(haystack)/16
+    CMPQ    R10 ,$0
+    JEQ     done_find4
+loopback_find4:
+    MOVOU (SI),X1                       // haystack[x]
+    MOVOU 8(SI),X2                      // haystack[x+8]
+
+    // MPSADBW $0, X0, X1               // Compare lower part X1[0:12] to X0[0:4], store in X1
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xc8; BYTE $0x00
+
+    // MPSADBW $0, X0, X2               // Compare lower part X2[0:12] to X0[0:4], store in X2
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd0; BYTE $0x00
+
+    PCMPEQW X4, X1                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X4, X2                      // if result == 0 {set word to 0xffff}
+    PACKSSWB X1, X1                     // Words->bytes
+    PACKSSWB X2, X2                     // Words->bytes
+    UNPCKLPD X2, X1
+
+    PMOVMSKB X1, R9                     // Transfer to bits
+
+    ADDQ $16, SI
+    MOVW R9, (DX)
+    ADDQ $2, DX
+    SUBQ $1, R10
+    JNZ loopback_find4
+
+done_find4:    
+    RET
+
+// func find4SSE4s(needle, haystack string, dst []uint16)
+TEXT ·find4SSE4s(SB), 7, $0
+    MOVQ    needle+0(FP),R8             // R8: &needle
+    MOVQ    haystack+16(FP),SI          // SI: &haystack
+    MOVQ    haystack_len+24(FP), R10    // R10: len(haystack)
+    MOVQ    dst+32(FP),DX               // DX: &dst
+    MOVD    (R8), X0                    // X0: needle
+    PXOR    X7, X7                      // X7: Zero
+
+    SHRQ   $4, R10                      // len(haystack)/16
+    CMPQ    R10 ,$0
+    JEQ     done_find4s
+loopback_find4s:
+    MOVOU (SI),X1                       // haystack[x]
+    MOVOU 8(SI),X2                      // haystack[x+8]
+
+    // MPSADBW $0, X0, X1               // Compare lower part X1[0:12] to X0[0:4], store in X1
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xc8; BYTE $0x00
+
+    // MPSADBW $0, X0, X2               // Compare lower part X2[0:12] to X0[0:4], store in X2
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd0; BYTE $0x00
+
+    PCMPEQW X4, X1                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X4, X2                      // if result == 0 {set word to 0xffff}
+    PACKSSWB X1, X1                     // Words->bytes
+    PACKSSWB X2, X2                     // Words->bytes
+    UNPCKLPD X2, X1
+
+    PMOVMSKB X1, R9                     // Transfer to bits
+
+    ADDQ $16, SI
+    MOVW R9, (DX)
+    ADDQ $2, DX
+    SUBQ $1, R10
+    JNZ loopback_find4s
+
+done_find4s:    
+    RET
+
+
+// func find8SSE4(needle, haystack []byte, dst []uint32)
+TEXT ·find8SSE4(SB), 7, $0
+    MOVQ    needle+0(FP),R8             // R8: &needle
+    MOVQ    haystack+24(FP),SI          // SI: &haystack
+    MOVQ    haystack_len+32(FP), R10    // R10: len(haystack)
+    MOVQ    dst+48(FP),DX               // DX: &dst
+
+    MOVQ    (R8), X0                    // X0: needle
+    PXOR    X7, X7                      // X7: Zero
+    PCMPEQW X5, X5                      
+    PCMPEQW X6, X6
+    PSRLW   $8, X5                       //  0xffff >> 8 = 0x00ff, lower byte mask per word (shifts in zeros)
+    PSLLW   $8, X6                       //  0xffff << 8  = 0xff00, upper byte mask per word.
+
+    SHRQ    $4, R10                      // len(haystack)/16
+    CMPQ    R10, $0
+    JZ      done_find8
+    SUBQ    $1, R10
+    JZ      last_find8
+loopback_find8:
+    MOVOU (SI),X1                       // haystack[x]
+    MOVOA X1, X2
+    MOVOU 8(SI),X3                      // haystack[x+8]
+    MOVOA X3, X4
+
+    // MPSADBW $0, X0, X1               // Compare lower part X1[0:12] to X0[0:4], store in X1
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xc8; BYTE $0x00
+
+    // MPSADBW $5, X0, X2               // Compare lower part X2[4:16] to X0[4:8], store in X2
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd0; BYTE $0x05
+
+    // MPSADBW $0, X0, X3               // Compare lower part X3[0:12] to X0[0:4], store in X3
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd8; BYTE $0x00
+
+    // MPSADBW $5, X0, X4               // Compare lower part X4[4:16] to X0[4:8], store in X4
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xe0; BYTE $0x05
+
+    PCMPEQW X7, X1                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X2                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X3                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X4                      // if result == 0 {set word to 0xffff}
+    PAND    X5, X1                      // Lower result as bytes
+    PAND    X6, X2                      // upper result as bytes
+    PAND    X5, X3                      // Lower result as bytes
+    PAND    X6, X4                      // upper result as bytes
+    POR     X2, X1
+    POR     X4, X3
+    PMOVMSKB X1, R9                     // Transfer to bits
+    PMOVMSKB X3, R8                     // Transfer to bits
+
+    ADDQ $16, SI
+    MOVW R9, (DX)
+    MOVW R8, 2(DX)
+    ADDQ $4, DX
+    SUBQ $1, R10
+    JNZ loopback_find8
+
+last_find8:
+    MOVOU (SI),X1                      // haystack[x]
+    MOVOA X1, X2
+    MOVQ 8(SI),X3                      // haystack[x+8:16]
+    MOVOA X3, X4
+
+    // MPSADBW $0, X0, X1               // Compare lower part X1[0:12] to X0[0:4], store in X1
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xc8; BYTE $0x00
+
+    // MPSADBW $5, X0, X2               // Compare lower part X2[4:16] to X0[4:8], store in X2
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd0; BYTE $0x05
+
+    // MPSADBW $0, X0, X3               // Compare lower part X3[0:12] to X0[0:4], store in X3
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd8; BYTE $0x00
+
+    // MPSADBW $5, X0, X4               // Compare lower part X4[4:16] to X0[4:8], store in X4
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xe0; BYTE $0x05
+
+    PCMPEQW X7, X1                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X2                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X3                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X4                      // if result == 0 {set word to 0xffff}
+    PAND    X5, X1                      // Lower result as bytes
+    PAND    X6, X2                      // upper result as bytes
+    PAND    X5, X3                      // Lower result as bytes
+    PAND    X6, X4                      // upper result as bytes
+    POR     X2, X1
+    POR     X4, X3
+    PMOVMSKB X1, R9                     // Transfer to bits
+    PMOVMSKB X3, R8                     // Transfer to bits
+
+    ANDQ $0x0157, R8                    // Ignore upper bytes
+    MOVW R9, (DX)
+    MOVW R8, 2(DX)
+
+done_find8:    
+    RET
+
+
+
+// func find8SSE4s(needle, haystack string, dst []uint32)
+TEXT ·find8SSE4s(SB), 7, $0
+    MOVQ    needle+0(FP),R8             // R8: &needle
+    MOVQ    haystack+16(FP),SI          // SI: &haystack
+    MOVQ    haystack_len+24(FP), R10    // R10: len(haystack)
+    MOVQ    dst+32(FP),DX               // DX: &dst
+
+    MOVQ    (R8), X0                    // X0: needle
+    PXOR    X7, X7                      // X7: Zero
+    PCMPEQW X5, X5                      
+    PCMPEQW X6, X6
+    PSRLW  $8, X5                       //  0xffff >> 8 = 0x00ff, lower byte mask per word (shifts in zeros)
+    PSLLW  $8, X6                       //  0xffff << 8  = 0xff00, upper byte mask per word.
+
+    SHRQ    $4, R10                      // len(haystack)/16
+    CMPQ    R10, $0
+    JZ      done_find8s
+    SUBQ    $1, R10
+    JZ      last_find8s
+
+loopback_find8s:
+    MOVOU (SI),X1                       // haystack[x]
+    MOVOA X1, X2
+    MOVOU 8(SI),X3                      // haystack[x+8]
+    MOVOA X3, X4
+
+    // MPSADBW $0, X0, X1               // Compare lower part X1[0:12] to X0[0:4], store in X1
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xc8; BYTE $0x00
+
+    // MPSADBW $5, X0, X2               // Compare lower part X2[4:16] to X0[4:8], store in X2
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd0; BYTE $0x05
+
+    // MPSADBW $0, X0, X3               // Compare lower part X3[0:12] to X0[0:4], store in X3
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd8; BYTE $0x00
+
+    // MPSADBW $5, X0, X4               // Compare lower part X4[4:16] to X0[4:8], store in X4
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xe0; BYTE $0x05
+
+    PCMPEQW X7, X1                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X2                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X3                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X4                      // if result == 0 {set word to 0xffff}
+    PAND    X5, X1                      // Lower result as bytes
+    PAND    X6, X2                      // upper result as bytes
+    PAND    X5, X3                      // Lower result as bytes
+    PAND    X6, X4                      // upper result as bytes
+    POR     X2, X1
+    POR     X4, X3
+    PMOVMSKB X1, R9                     // Transfer to bits
+    PMOVMSKB X3, R8                     // Transfer to bits
+
+    ADDQ $16, SI
+    MOVW R9, (DX)
+    MOVW R8, 2(DX)
+    ADDQ $4, DX
+    SUBQ $1, R10
+    JNZ loopback_find8s
+
+last_find8s:
+    MOVOU (SI),X1                      // haystack[x]
+    MOVOA X1, X2
+    MOVQ 8(SI),X3                      // haystack[x+8:16]
+    MOVOA X3, X4
+
+    // MPSADBW $0, X0, X1               // Compare lower part X1[0:12] to X0[0:4], store in X1
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xc8; BYTE $0x00
+
+    // MPSADBW $5, X0, X2               // Compare lower part X2[4:16] to X0[4:8], store in X2
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd0; BYTE $0x05
+
+    // MPSADBW $0, X0, X3               // Compare lower part X3[0:12] to X0[0:4], store in X3
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xd8; BYTE $0x00
+
+    // MPSADBW $5, X0, X4               // Compare lower part X4[4:16] to X0[4:8], store in X4
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x42; BYTE $0xe0; BYTE $0x05
+
+    PCMPEQW X7, X1                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X2                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X3                      // if result == 0 {set word to 0xffff}
+    PCMPEQW X7, X4                      // if result == 0 {set word to 0xffff}
+    PAND    X5, X1                      // Lower result as bytes
+    PAND    X6, X2                      // upper result as bytes
+    PAND    X5, X3                      // Lower result as bytes
+    PAND    X6, X4                      // upper result as bytes
+    POR     X2, X1
+    POR     X4, X3
+    PMOVMSKB X1, R9                     // Transfer to bits
+    PMOVMSKB X3, R8                     // Transfer to bits
+
+    ANDQ $0x0157, R8                    // Ignore upper bytes
+    MOVW R9, (DX)
+    MOVW R8, 2(DX)
+done_find8s:    
+    RET
+
+
+// func matchLenSSE4(a, b []byte, max int) int
+TEXT ·matchLenSSE4(SB), 7, $0
+    MOVQ    a+0(FP),R8                  // R8: &a
+    MOVQ    b+24(FP),R9                 // R9: &b
+    MOVQ    max+48(FP), R10             // R10: max
+    XORQ    R11, R11                    // match length
+
+    MOVQ    R10, R12
+    SHRQ    $4, R10                     // max/16
+    ANDQ    $15, R12                    // max & 15
+    CMPQ    R10, $0
+    JEQ     matchlen_verysmall
+loopback_matchlen:
+    MOVOU   (R8),X0                     // a[x]
+    MOVOU   (R9),X1                     // b[x]
+
+    // PCMPESTRI $0x18, X1, X0
+    BYTE $0x66; BYTE $0x0f; BYTE $0x3a
+    BYTE $0x61; BYTE $0xc1; BYTE $0x18
+
+    JC      match_ended
+
+    ADDQ    $16, R8
+    ADDQ    $16, R9
+    ADDQ    $16, R11
+
+    SUBQ    $1, R10
+    JNZ     loopback_matchlen
+
+matchlen_verysmall:
+    CMPQ    R12 ,$0
+    JEQ     done_matchlen
+loopback_matchlen_single:
+    // Naiive, but small use
+    MOVB   (R8), R13
+    MOVB   (R9), R14
+    CMPB   R13, R14
+    JNE    done_matchlen
+    ADDQ   $1, R8
+    ADDQ   $1, R9
+    ADDQ   $1, R11
+    SUBQ   $1, R12
+    JNZ loopback_matchlen_single
+    MOVQ    R11, ret+56(FP)
+    RET
+match_ended:
+    ADDQ    CX, R11
+done_matchlen:
+    MOVQ    R11, ret+56(FP)
+    RET
