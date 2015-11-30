@@ -181,7 +181,11 @@ func (f *fstate) addLine(b []byte) error {
 		if err != nil {
 			return err
 		}
-		_, err = fmt.Fprintln(f.out, "//", s)
+		if len(s) > 0 {
+			_, err = fmt.Fprintln(f.out, "//", s)
+		} else {
+			_, err = fmt.Fprintln(f.out, "//")
+		}
 		if err != nil {
 			return err
 		}
@@ -377,7 +381,7 @@ func (st statement) willContinue() bool {
 
 func (st statement) define() string {
 	if st.instruction == "#define" && len(st.params) > 0 {
-		r := strings.TrimSpace(strings.Split(st.params[0],"(")[0])
+		r := strings.TrimSpace(strings.Split(st.params[0], "(")[0])
 		r = strings.Trim(r, `\`)
 		return r
 	}
