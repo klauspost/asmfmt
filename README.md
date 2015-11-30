@@ -69,7 +69,7 @@ You should only run `asmfmt` on files that are assembler files. Assembler files 
 * It will remove trailing whitespace.
 * It will align the first parameter.
 * It will align all comments in a block.
-* It will eliminate multiple black lines.
+* It will eliminate multiple blank lines.
 * Forced newline before comments, except when preceeded by label or another comment.
 * Forced newline before labels, except when preceeded by comment.
 * Retains block breaks (newline between blocks).
