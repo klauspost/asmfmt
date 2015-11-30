@@ -104,7 +104,7 @@ TEXT runtime·setitimer(SB), NOSPLIT, $0
 // I'd much rather write this in C but we need
 // assembly for the 96-bit multiply and RDTSC.
 TEXT runtime·now(SB), NOSPLIT, $40
-	MOVL $0xffff0000, BP //  comm page base 
+	MOVL $0xffff0000, BP // comm page base
 
 	// Test for slow CPU. If so, the math is completely
 	// different, and unimplemented here, so use the

@@ -147,7 +147,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # on benchmark. Lower coefficients are for ECDSA sign, relatively fastest
 # server-side operation. Keep in mind that +100% means 2x improvement.
  */
-
 // This file contains constant-time, 64-bit assembly implementation of
 // P256. The optimizations performed here are described in detail in:
 //   S.Gueron and V.Krasnov, "Fast prime field elliptic-curve cryptography with
@@ -2027,72 +2026,72 @@ TEXT ·p256PointAddAffineAsm(SB), 0, $512-96
 
 	// Begin point add
 	LDacc (z1in)
-	CALL  p256SqrInternal(SB)  // z1ˆ2
-	ST    (z1sqr)
+	CALL p256SqrInternal(SB)  // z1ˆ2
+	ST (z1sqr)
 
-	LDt  (x2in)
+	LDt (x2in)
 	CALL p256MulInternal(SB)  // x2 * z1ˆ2
 
-	LDt  (x1in)
+	LDt (x1in)
 	CALL p256SubInternal(SB)  // h = u2 - u1
-	ST   (h)
+	ST (h)
 
-	LDt  (z1in)
+	LDt (z1in)
 	CALL p256MulInternal(SB)  // z3 = h * z1
-	ST   (zout)
+	ST (zout)
 
 	LDacc (z1sqr)
-	CALL  p256MulInternal(SB)  // z1ˆ3
+	CALL p256MulInternal(SB)  // z1ˆ3
 
-	LDt  (y2in)
+	LDt (y2in)
 	CALL p256MulInternal(SB)  // s2 = y2 * z1ˆ3
-	ST   (s2)
+	ST (s2)
 
-	LDt  (y1in)
+	LDt (y1in)
 	CALL p256SubInternal(SB)  // r = s2 - s1
-	ST   (r)
+	ST (r)
 
 	CALL p256SqrInternal(SB)  // rsqr = rˆ2
-	ST   (rsqr)
+	ST (rsqr)
 
 	LDacc (h)
-	CALL  p256SqrInternal(SB)  // hsqr = hˆ2
-	ST    (hsqr)
+	CALL p256SqrInternal(SB)  // hsqr = hˆ2
+	ST (hsqr)
 
-	LDt  (h)
+	LDt (h)
 	CALL p256MulInternal(SB)  // hcub = hˆ3
-	ST   (hcub)
+	ST (hcub)
 
-	LDt  (y1in)
+	LDt (y1in)
 	CALL p256MulInternal(SB)  // y1 * hˆ3
-	ST   (s2)
+	ST (s2)
 
 	LDacc (x1in)
-	LDt   (hsqr)
-	CALL  p256MulInternal(SB)  // u1 * hˆ2
-	ST    (h)
+	LDt (hsqr)
+	CALL p256MulInternal(SB)  // u1 * hˆ2
+	ST (h)
 
-	p256MulBy2Inline                      // u1 * hˆ2 * 2, inline
-	LDacc            (rsqr)
-	CALL             p256SubInternal(SB)  // rˆ2 - u1 * hˆ2 * 2
+	p256MulBy2Inline			       // u1 * hˆ2 * 2, inline
+	LDacc (rsqr)
+	CALL p256SubInternal(SB)  // rˆ2 - u1 * hˆ2 * 2
 
-	LDt  (hcub)
+	LDt (hcub)
 	CALL p256SubInternal(SB)
-	ST   (xout)
+	ST (xout)
 
-	MOVQ  acc4, t0
-	MOVQ  acc5, t1
-	MOVQ  acc6, t2
-	MOVQ  acc7, t3
+	MOVQ acc4, t0
+	MOVQ acc5, t1
+	MOVQ acc6, t2
+	MOVQ acc7, t3
 	LDacc (h)
-	CALL  p256SubInternal(SB)
+	CALL p256SubInternal(SB)
 
-	LDt  (r)
+	LDt (r)
 	CALL p256MulInternal(SB)
 
-	LDt  (s2)
+	LDt (s2)
 	CALL p256SubInternal(SB)
-	ST   (yout)
+	ST (yout)
 
 	// Load stored values from stack
 	MOVQ rptr, AX
@@ -2277,89 +2276,89 @@ TEXT ·p256PointAddAsm(SB), 0, $672-76
 
 	// Begin point add
 	LDacc (z2in)
-	CALL  p256SqrInternal(SB)  // z2ˆ2
-	ST    (z2sqr)
-	LDt   (z2in)
-	CALL  p256MulInternal(SB)  // z2ˆ3
-	LDt   (y1in)
-	CALL  p256MulInternal(SB)  // s1 = z2ˆ3*y1
-	ST    (s1)
+	CALL p256SqrInternal(SB)  // z2ˆ2
+	ST (z2sqr)
+	LDt (z2in)
+	CALL p256MulInternal(SB)  // z2ˆ3
+	LDt (y1in)
+	CALL p256MulInternal(SB)  // s1 = z2ˆ3*y1
+	ST (s1)
 
 	LDacc (z1in)
-	CALL  p256SqrInternal(SB)  // z1ˆ2
-	ST    (z1sqr)
-	LDt   (z1in)
-	CALL  p256MulInternal(SB)  // z1ˆ3
-	LDt   (y2in)
-	CALL  p256MulInternal(SB)  // s2 = z1ˆ3*y2
-	ST    (s2)
+	CALL p256SqrInternal(SB)  // z1ˆ2
+	ST (z1sqr)
+	LDt (z1in)
+	CALL p256MulInternal(SB)  // z1ˆ3
+	LDt (y2in)
+	CALL p256MulInternal(SB)  // s2 = z1ˆ3*y2
+	ST (s2)
 
-	LDt  (s1)
+	LDt (s1)
 	CALL p256SubInternal(SB)  // r = s2 - s1
-	ST   (r)
+	ST (r)
 
 	LDacc (z2sqr)
-	LDt   (x1in)
-	CALL  p256MulInternal(SB)  // u1 = x1 * z2ˆ2
-	ST    (u1)
+	LDt (x1in)
+	CALL p256MulInternal(SB)  // u1 = x1 * z2ˆ2
+	ST (u1)
 	LDacc (z1sqr)
-	LDt   (x2in)
-	CALL  p256MulInternal(SB)  // u2 = x2 * z1ˆ2
-	ST    (u2)
+	LDt (x2in)
+	CALL p256MulInternal(SB)  // u2 = x2 * z1ˆ2
+	ST (u2)
 
-	LDt  (u1)
+	LDt (u1)
 	CALL p256SubInternal(SB)  // h = u2 - u1
-	ST   (h)
+	ST (h)
 
 	LDacc (r)
-	CALL  p256SqrInternal(SB)  // rsqr = rˆ2
-	ST    (rsqr)
+	CALL p256SqrInternal(SB)  // rsqr = rˆ2
+	ST (rsqr)
 
 	LDacc (h)
-	CALL  p256SqrInternal(SB)  // hsqr = hˆ2
-	ST    (hsqr)
+	CALL p256SqrInternal(SB)  // hsqr = hˆ2
+	ST (hsqr)
 
-	LDt  (h)
+	LDt (h)
 	CALL p256MulInternal(SB)  // hcub = hˆ3
-	ST   (hcub)
+	ST (hcub)
 
-	LDt  (s1)
+	LDt (s1)
 	CALL p256MulInternal(SB)
-	ST   (s2)
+	ST (s2)
 
 	LDacc (z1in)
-	LDt   (z2in)
-	CALL  p256MulInternal(SB)  // z1 * z2
-	LDt   (h)
-	CALL  p256MulInternal(SB)  // z1 * z2 * h
-	ST    (zout)
+	LDt (z2in)
+	CALL p256MulInternal(SB)  // z1 * z2
+	LDt (h)
+	CALL p256MulInternal(SB)  // z1 * z2 * h
+	ST (zout)
 
 	LDacc (hsqr)
-	LDt   (u1)
-	CALL  p256MulInternal(SB)  // hˆ2 * u1
-	ST    (u2)
+	LDt (u1)
+	CALL p256MulInternal(SB)  // hˆ2 * u1
+	ST (u2)
 
-	p256MulBy2Inline                      // u1 * hˆ2 * 2, inline
-	LDacc            (rsqr)
-	CALL             p256SubInternal(SB)  // rˆ2 - u1 * hˆ2 * 2
+	p256MulBy2Inline	         // u1 * hˆ2 * 2, inline
+	LDacc (rsqr)
+	CALL p256SubInternal(SB)  // rˆ2 - u1 * hˆ2 * 2
 
-	LDt  (hcub)
+	LDt (hcub)
 	CALL p256SubInternal(SB)
-	ST   (xout)
+	ST (xout)
 
-	MOVQ  acc4, t0
-	MOVQ  acc5, t1
-	MOVQ  acc6, t2
-	MOVQ  acc7, t3
+	MOVQ acc4, t0
+	MOVQ acc5, t1
+	MOVQ acc6, t2
+	MOVQ acc7, t3
 	LDacc (u2)
-	CALL  p256SubInternal(SB)
+	CALL p256SubInternal(SB)
 
-	LDt  (r)
+	LDt (r)
 	CALL p256MulInternal(SB)
 
-	LDt  (s2)
+	LDt (s2)
 	CALL p256SubInternal(SB)
-	ST   (yout)
+	ST (yout)
 
 	MOVOU xout(16*0), X0
 	MOVOU xout(16*1), X1
@@ -2437,18 +2436,18 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 
 	// Begin point double
 	LDacc (z)
-	CALL  p256SqrInternal(SB)
-	ST    (zsqr)
+	CALL p256SqrInternal(SB)
+	ST (zsqr)
 
-	LDt           (x)
+	LDt (x)
 	p256AddInline
-	STt           (m)
+	STt (m)
 
-	LDacc            (z)
-	LDt              (y)
-	CALL             p256MulInternal(SB)
+	LDacc (z)
+	LDt (y)
+	CALL p256MulInternal(SB)
 	p256MulBy2Inline
-	MOVQ             rptr, AX
+	MOVQ rptr, AX
 
 	// Store z
 	MOVQ t0, (16*4 + 8*0)(AX)
@@ -2457,25 +2456,25 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 	MOVQ t3, (16*4 + 8*3)(AX)
 
 	LDacc (x)
-	LDt   (zsqr)
-	CALL  p256SubInternal(SB)
-	LDt   (m)
-	CALL  p256MulInternal(SB)
-	ST    (m)
+	LDt (zsqr)
+	CALL p256SubInternal(SB)
+	LDt (m)
+	CALL p256MulInternal(SB)
+	ST (m)
 
 	// Multiply by 3
 	p256MulBy2Inline
-	LDacc            (m)
+	LDacc (m)
 	p256AddInline
-	STt              (m)
+	STt (m)
 
 	// //////////////////////
-	LDacc            (y)
+	LDacc (y)
 	p256MulBy2Inline
 	t2acc
-	CALL             p256SqrInternal(SB)
-	ST               (s)
-	CALL             p256SqrInternal(SB)
+	CALL  p256SqrInternal(SB)
+	ST (s)
+	CALL  p256SqrInternal(SB)
 
 	// Divide by 2
 	XORQ mul0, mul0
@@ -2501,20 +2500,20 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 	SHRQ $1, acc5:acc6
 	SHRQ $1, acc6:acc7
 	SHRQ $1, acc7:mul0
-	ST   (y)
+	ST (y)
 
 	// ///////////////////////
-	LDacc            (x)
-	LDt              (s)
-	CALL             p256MulInternal(SB)
-	ST               (s)
+	LDacc (x)
+	LDt (s)
+	CALL p256MulInternal(SB)
+	ST (s)
 	p256MulBy2Inline
-	STt              (tmp)
+	STt (tmp)
 
 	LDacc (m)
-	CALL  p256SqrInternal(SB)
-	LDt   (tmp)
-	CALL  p256SubInternal(SB)
+	CALL p256SqrInternal(SB)
+	LDt (tmp)
+	CALL p256SubInternal(SB)
 
 	MOVQ rptr, AX
 
@@ -2528,10 +2527,10 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 	LDacc (s)
 	CALL  p256SubInternal(SB)
 
-	LDt  (m)
+	LDt (m)
 	CALL p256MulInternal(SB)
 
-	LDt  (y)
+	LDt (y)
 	CALL p256SubInternal(SB)
 	MOVQ rptr, AX
 
