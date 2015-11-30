@@ -28,6 +28,14 @@ go get -u github.com/klauspost/asmfmt/cmd/goimports/...
 go get -u github.com/klauspost/asmfmt/cmd/goreturns/...
 ```
 
+To test if the modified version is used, use `goimports -help`, and the output should look like this:
+
+```
+usage: goimports [flags] [path ...]
+    [flags]
+(this version includes asmfmt)
+```
+
 Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler files as well.
 
 
