@@ -15,13 +15,14 @@ import (
 	"go/ast"
 	"go/printer"
 	"go/token"
-	"internal/format"
 	"io"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/klauspost/asmfmt/cmd/gofmt/format"
 )
 
 var (

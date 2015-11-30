@@ -85,7 +85,7 @@ func runTest(t *testing.T, in, out string) {
 	initRewrite()
 
 	var buf bytes.Buffer
-	err := processFile(in, nil, &buf, stdin)
+	err := processGoFile(in, nil, &buf, stdin)
 	if err != nil {
 		t.Error(err)
 		return
