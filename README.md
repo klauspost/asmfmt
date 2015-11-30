@@ -10,6 +10,8 @@ This will format your assembler code in a similar way that `gofmt` formats your 
 [1]: https://godoc.org/github.com/klauspost/asmfmt?status.svg
 [2]: https://godoc.org/github.com/klauspost/asmfmt
 
+See [Example](http://www.diff-online.com/view/565c48ccabd81).
+
 # install
 
 To install the standalone formatter, 
