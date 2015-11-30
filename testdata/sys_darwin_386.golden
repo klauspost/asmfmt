@@ -407,7 +407,7 @@ TEXT runtime·bsdthread_register(SB), NOSPLIT, $40
 // Assumes system call number in AX,
 // caller PC on stack, caller's caller PC next,
 // and then the system call arguments.
-// 
+//
 // Can be used for BSD too, but we don't,
 // because if you use this interface the BSD
 // system call numbers need an extra field

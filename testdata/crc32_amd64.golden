@@ -84,7 +84,7 @@ TEXT ·haveSSE41(SB), NOSPLIT, $0
 	RET
 
 // CRC32 polynomial data
-// 
+//
 // These constants are lifted from the
 // Linux kernel, since they avoid the costly
 // PSHUFB 16 byte reversal proposed in the

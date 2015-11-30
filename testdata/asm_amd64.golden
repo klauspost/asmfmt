@@ -283,7 +283,7 @@ onm:
  * support for morestack
  */
 // Called during function prolog when more stack is needed.
-// 
+//
 // The traceback routines see morestack on a g0 as being
 // the top of a stack (for example, morestack calling newstack
 // calling the scheduler calling newm calling gc), so we must
@@ -768,7 +768,7 @@ havem:
 	// size as cgocallback_gofunc's frame declared above)
 	// so that the traceback will seamlessly trace back into
 	// the earlier calls.
-	// 
+	//
 	// In the new goroutine, 0(SP) holds the saved R8.
 	MOVQ m_curg(BP), SI
 	MOVQ SI, g(CX)
