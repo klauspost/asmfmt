@@ -50,6 +50,7 @@ func report(err error) {
 func usage() {
 	fmt.Fprintf(os.Stderr, "usage: goreturns [flags] [path ...]\n")
 	flag.PrintDefaults()
+	fmt.Fprintf(os.Stderr, "(this version includes asmfmt)\n")
 	os.Exit(2)
 }
 
