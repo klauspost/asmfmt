@@ -192,7 +192,7 @@ TEXT runtime·mcall(SB), NOSPLIT, $0-8
 	POPQ  AX
 	MOVQ  $runtime·badmcall2(SB), AX
 	JMP   AX
-RET
+	RET
 
 // switchtoM is a dummy routine that onM leaves at the bottom
 // of the G stack.  We need to distinguish the routine that

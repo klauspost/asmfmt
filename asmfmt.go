@@ -231,6 +231,8 @@ func (f *fstate) addLine(b []byte) error {
 	}()
 	f.queued = append(f.queued, *st)
 	if st.isTerminator() {
+		// Terminators should always be at level 1
+		f.indentation = 1
 		err := f.flush()
 		if err != nil {
 			return err
