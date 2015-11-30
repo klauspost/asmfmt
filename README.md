@@ -3,6 +3,13 @@ Go Assembler Formatter
 
 This will format your assembler code in a similar way that `gofmt` formats your Go code.
 
+[![Build Status](https://travis-ci.org/klauspost/asmfmt.svg?branch=master)](https://travis-ci.org/klauspost/asmfmt)
+[![Windows Build](https://ci.appveyor.com/api/projects/status/s729ayhkqkjf0ye6/branch/master?svg=true)](https://ci.appveyor.com/project/klauspost/asmfmt/branch/master)
+[![GoDoc][1]][2]
+
+[1]: https://godoc.org/github.com/klauspost/asmfmt?status.svg
+[2]: https://godoc.org/github.com/klauspost/asmfmt
+
 # install
 
 To install the standalone formatter, 
