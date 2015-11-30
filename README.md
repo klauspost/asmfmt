@@ -70,12 +70,12 @@ You should only run `asmfmt` on files that are assembler files. Assembler files 
 * It will align the first parameter.
 * It will align all comments in a block.
 * It will eliminate multiple blank lines.
-* Forced newline before comments, except when preceeded by label or another comment.
-* Forced newline before labels, except when preceeded by comment.
+* Forced newline before comments, except when preceded by label or another comment.
+* Forced newline before labels, except when preceded by comment.
 * Retains block breaks (newline between blocks).
 * It will convert single line block comments to line comments.
 * Line comments have a space after `//`, except if comment starts with `+`.
-* There is always a space between paramters.
+* There is always a space between parameters.
 * Macros in the same file are tracked, and not included in parameter indentation.
 * `TEXT`, `DATA` and `GLOBL` and labels are level 0 indentation.
 * Aligns `\` in multiline macros.
