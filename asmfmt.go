@@ -178,14 +178,15 @@ func (f *fstate) addLine(b []byte) error {
 		if err != nil {
 			return err
 		}
-		
+
 		// Preserve whitespace if the first after the comment
 		// is a whitespace
 		ts := strings.TrimSpace(s)
-		if ts != s && len(ts) > 0 {
+		if (ts != s && len(ts) > 0) || strings.HasPrefix(s, "+") {
 			_, err = fmt.Fprintln(f.out, "//"+s)
 		} else if len(ts) > 0 {
-			_, err = fmt.Fprintln(f.out, "//",s)
+			// Insert a space before the comment
+			_, err = fmt.Fprintln(f.out, "//", s)
 		} else {
 			_, err = fmt.Fprintln(f.out, "//")
 		}
