@@ -150,6 +150,7 @@ func TestRewrite(t *testing.T) {
 	}
 }
 
+/*
 // Test case for issue 3961.
 func TestCRLF(t *testing.T) {
 	const input = "testdata/crlf.input"   // must contain CR/LF's
@@ -171,3 +172,4 @@ func TestCRLF(t *testing.T) {
 		t.Errorf("%s contains CR's", golden)
 	}
 }
+*/
