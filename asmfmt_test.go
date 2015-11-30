@@ -27,13 +27,13 @@ f, err := os.Open(in)
 
 	got, err := Format(f)
 	if err != nil {
-		t.Error(err)
+		t.Error(in, "-", err)
 		return
 	}
 
 	expected, err := ioutil.ReadFile(out)
 	if err != nil  && !*update {
-		t.Error(err)
+		t.Error(out, "-", err)
 		return
 	}
 
@@ -113,4 +113,18 @@ func diff(b1, b2 []byte) (data []byte, err error) {
 	}
 	return
 
+}
+
+// Go files must fail.
+func TestGoFile(t *testing.T) {
+	input :=`package main
+
+	func main() {
+	}
+	`
+	_, err := Format(bytes.NewBuffer([]byte(input)))
+	if err == nil {
+		t.Error("go file not detected")
+		return
+	}
 }

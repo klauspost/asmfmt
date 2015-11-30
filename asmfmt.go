@@ -208,6 +208,11 @@ func (f *fstate) addLine(b []byte) error {
 	if def := st.define(); def != "" {
 		f.defines[def] = struct{}{}
 	}
+	if st.instruction == "package" {
+		if _,ok := f.defines["package"]; !ok {
+			return fmt.Errorf("package instruction found. Go files are not supported")
+		}
+	}
 	// Should this line be at level 0?
 	if st.level0() {
 		err := f.flush()
