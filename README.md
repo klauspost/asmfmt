@@ -38,6 +38,18 @@ usage: goimports [flags] [path ...]
 
 Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler files as well.
 
+# emacs
+
+To automatically format assembler, in `.emacs` add:
+
+```
+(defun asm-mode-setup ()
+  (setq gofmt-command "asmfmt")
+  (add-hook 'before-save-hook 'gofmt)
+)
+
+(add-hook 'asm-mode-hook 'asm-mode-setup)
+```
 
 # usage
 
