@@ -40,16 +40,17 @@ func Format(in io.Reader) ([]byte, error) {
 }
 
 type fstate struct {
-	out         *bytes.Buffer
-	insideBlock bool // Block comment
-	indentation int  // Indentation level
-	lastEmpty   bool
-	lastComment bool
-	lastStar    bool // Block comment, last line started with a star.
-	lastLabel   bool
-	anyContents bool
-	queued      []statement
-	defines     map[string]struct{}
+	out           *bytes.Buffer
+	insideBlock   bool // Block comment
+	indentation   int  // Indentation level
+	lastEmpty     bool
+	lastComment   bool
+	lastStar      bool // Block comment, last line started with a star.
+	lastLabel     bool
+	anyContents   bool
+	lastContinued bool // Last line continued
+	queued        []statement
+	defines       map[string]struct{}
 }
 
 type statement struct {
@@ -163,6 +164,10 @@ func (f *fstate) addLine(b []byte) error {
 		if f.lastEmpty || !f.anyContents {
 			return nil
 		}
+		if f.lastContinued {
+			f.indentation = 0
+			f.lastContinued = false
+		}
 		f.lastEmpty = true
 		return f.out.WriteByte('\n')
 	}
@@ -193,7 +198,7 @@ func (f *fstate) addLine(b []byte) error {
 			return err
 		}
 
-		// Preserve whitespace if the first after the comment
+		// Preserve whitespace if the first character after the comment
 		// is a whitespace
 		ts := strings.TrimSpace(s)
 		if (ts != s && len(ts) > 0) || (len(s) > 0 && strings.ContainsAny(string(s[0]), `+/`)) {
@@ -257,7 +262,7 @@ func (f *fstate) addLine(b []byte) error {
 		f.lastLabel = false
 	}()
 	f.queued = append(f.queued, *st)
-	if st.isTerminator() || multiLineEnd(f.queued) {
+	if st.isTerminator() || f.lastContinued && !st.continued {
 		// Terminators should always be at level 1
 		f.indentation = 1
 		err := f.flush()
@@ -269,6 +274,7 @@ func (f *fstate) addLine(b []byte) error {
 		// handles cases where a JMP/RET isn't a terminator
 		f.indentation = 1
 	}
+	f.lastContinued = st.continued
 	return nil
 }
 
@@ -441,19 +447,6 @@ func (st statement) define() string {
 		return r
 	}
 	return ""
-}
-
-// multiLineEnd will return true if the last statement terminates a multiLine
-// statement.
-func multiLineEnd(s []statement) bool {
-	if len(s) < 2 {
-		return false
-	}
-	s = s[len(s)-2:]
-	if s[0].continued && !s[1].continued {
-		return true
-	}
-	return false
 }
 
 // formatStatements will format a slice of statements and return each line
