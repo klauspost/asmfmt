@@ -10,7 +10,7 @@ This will format your assembler code in a similar way that `gofmt` formats your 
 [1]: https://godoc.org/github.com/klauspost/asmfmt?status.svg
 [2]: https://godoc.org/github.com/klauspost/asmfmt
 
-See [Example 1](https://files.klauspost.com/diff.html), [Example 2](https://files.klauspost.com/diff2.html), or compare files in the [testdata folder](https://github.com/klauspost/asmfmt/tree/master/testdata).
+See [Example 1](https://files.klauspost.com/diff.html), [Example 2](https://files.klauspost.com/diff2.html), [Example 3](https://files.klauspost.com/diff3.html), or compare files in the [testdata folder](https://github.com/klauspost/asmfmt/tree/master/testdata).
 
 Status: Beta. The format will still change, and there may unknown cases where the formatting mangles the output. Please report any feedback in the issue section.
 
