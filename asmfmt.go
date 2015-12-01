@@ -108,8 +108,8 @@ func (f *fstate) addLine(b []byte) error {
 		if len(pre) > 0 {
 			// Add items before the comment section as a line.
 			if ends > starts && ends >= len(s)-2 {
-					comm := strings.TrimSpace(s[starts+2 : ends])
-					return f.addLine([]byte(pre + " //" + comm))
+				comm := strings.TrimSpace(s[starts+2 : ends])
+				return f.addLine([]byte(pre + " //" + comm))
 			}
 			err := f.addLine([]byte(pre))
 			if err != nil {
