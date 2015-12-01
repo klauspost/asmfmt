@@ -45,6 +45,7 @@ type fstate struct {
 	indentation int  // Indentation level
 	lastEmpty   bool
 	lastComment bool
+	lastStar    bool // Block comment, last line started with a star.
 	lastLabel   bool
 	anyContents bool
 	queued      []statement
@@ -70,8 +71,13 @@ func (f *fstate) addLine(b []byte) error {
 		}()
 		if strings.Contains(s, "*/") {
 			ends := strings.Index(s, "*/")
-			end := s[:ends]
-			f.out.WriteString(end + " */\n")
+			end := strings.TrimSpace(s[:ends])
+			if f.lastStar {
+				end = end + " */\n"
+			} else {
+				end = end + "*/\n"
+			}
+			f.out.WriteString(end)
 			f.insideBlock = false
 			s = strings.TrimSpace(s[ends+2:])
 			if len(s) == 0 {
@@ -84,11 +90,15 @@ func (f *fstate) addLine(b []byte) error {
 				if err != nil {
 					return err
 				}
+				f.lastStar = true
+			} else {
+				f.lastStar = false
 			}
 			_, err := fmt.Fprintln(f.out, s)
 			return err
 		}
 	}
+
 	if strings.Contains(s, "/*") {
 		starts := strings.Index(s, "/*")
 		ends := strings.Index(s, "*/")
@@ -133,6 +143,7 @@ func (f *fstate) addLine(b []byte) error {
 		s = strings.TrimSpace(s[starts+2:])
 		f.insideBlock = ends < 0
 		f.lastComment = true
+		f.lastStar = true
 		if len(s) == 0 {
 			f.out.WriteByte('\n')
 			return nil
@@ -160,6 +171,7 @@ func (f *fstate) addLine(b []byte) error {
 	defer func() {
 		f.anyContents = true
 		f.lastEmpty = false
+		f.lastStar = false
 	}()
 
 	// Comment only line.

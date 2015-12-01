@@ -146,7 +146,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # Ranges denote minimum and maximum improvement coefficients depending
 # on benchmark. Lower coefficients are for ECDSA sign, relatively fastest
 # server-side operation. Keep in mind that +100% means 2x improvement.
- */
+*/
 // This file contains constant-time, 64-bit assembly implementation of
 // P256. The optimizations performed here are described in detail in:
 //   S.Gueron and V.Krasnov, "Fast prime field elliptic-curve cryptography with
