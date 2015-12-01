@@ -456,15 +456,10 @@ func (st statement) define() string {
 func formatStatements(s []statement) []string {
 	res := make([]string, len(s))
 	maxParam := 0
-	maxInstr := 0
 	maxComm := 0
 	for _, x := range s {
-		l := len([]rune(x.instruction)) + 1 // Instruction length
 		// Ignore length if we are a define "function"
-		if l > maxInstr && !x.function {
-			maxInstr = l
-		}
-		l = len(x.params) // Spaces between parameters
+		l := len(x.params) // Spaces between parameters
 		// Add parameters
 		for _, y := range x.params {
 			l += len([]rune(y))
@@ -484,20 +479,18 @@ func formatStatements(s []statement) []string {
 		p := strings.Join(x.params, ", ")
 		r := x.instruction
 		if len(x.params) > 0 || len(x.comment) > 0 {
-			for len(r) < maxInstr {
-				r += " "
-			}
+			r += "\t"
 		}
 		r = r + p
 		if len(x.comment) > 0 {
-			it := maxParam - len([]rune(r)) + maxInstr
+			it := maxParam - len([]rune(p))
 			for i := 0; i < it; i++ {
 				r = r + " "
 			}
 			r += fmt.Sprintf("// %s", x.comment)
 		}
 		if x.continued {
-			it := maxComm - len([]rune(r)) + maxInstr
+			it := maxComm - len([]rune(p))
 			for i := 0; i < it; i++ {
 				r = r + " "
 			}
