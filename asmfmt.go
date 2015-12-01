@@ -106,20 +106,14 @@ func (f *fstate) addLine(b []byte) error {
 		pre := s[:starts]
 		pre = strings.TrimSpace(pre)
 		if len(pre) > 0 {
-			q := len(f.queued)
 			// Add items before the comment section as a line.
+			if ends > starts && ends >= len(s)-2 {
+					comm := strings.TrimSpace(s[starts+2 : ends])
+					return f.addLine([]byte(pre + " //" + comm))
+			}
 			err := f.addLine([]byte(pre))
 			if err != nil {
 				return err
-			}
-			// If new instruction was added.
-			if len(f.queued) > q {
-				// Convert end-of-line /* comment */ to // comment
-				if ends > starts && ends >= len(s)-2 {
-					f.queued[len(f.queued)-1].comment += strings.TrimSpace(s[starts+2 : ends])
-					ends = 0
-					return nil
-				}
 			}
 		}
 
@@ -232,6 +226,14 @@ func (f *fstate) addLine(b []byte) error {
 			return fmt.Errorf("package instruction found. Go files are not supported")
 		}
 	}
+
+	// Move anything that isn't a comment to the next line
+	if st.isLabel() && len(st.params) > 0 {
+		idx := strings.Index(s, ":")
+		st = newStatement(s[:idx+1], f.defines)
+		defer f.addLine([]byte(s[idx+1:]))
+	}
+
 	// Should this line be at level 0?
 	if st.level0() {
 		err := f.flush()

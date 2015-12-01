@@ -33,16 +33,14 @@
 // take care and double check with objdump.
 #define FROM	R11
 #define N	R12
-#define TMP	R12
-// N and TMP don't overlap
+#define TMP	R12  // N and TMP don't overlap
 #define TMP1	R5
 
 #define RSHIFT	R5
 #define LSHIFT	R6
 #define OFFSET	R7
 
-#define BR0	R0
-// shared with TS
+#define BR0	R0  // shared with TS
 #define BW0	R1
 #define BR1	R1
 #define BW1	R2
@@ -58,8 +56,7 @@
 #define FW2	R3
 #define FR2	R4
 #define FW3	R4
-#define FR3	R8
-// shared with TE
+#define FR3	R8  // shared with TE
 
 TEXT runtime·memmove(SB), NOSPLIT, $4-12
 _memmove:
@@ -77,8 +74,7 @@ _back:
 	CMP $4, N    // need at least 4 bytes to copy
 	BLT _b1tail
 
-_b4align:
-	// align destination on 4
+_b4align:  // align destination on 4
 	AND.S $3, TE, TMP
 	BEQ   _b4aligned
 
@@ -86,8 +82,7 @@ _b4align:
 	MOVBU.W TMP, -1(TE)   // pre-indexed
 	B       _b4align
 
-_b4aligned:
-	// is source now aligned?
+_b4aligned:  // is source now aligned?
 	AND.S $3, FROM, TMP
 	BNE   _bunaligned
 
@@ -102,8 +97,7 @@ _b32loop:
 	MOVM.DB.W [R0-R7], (TE)
 	B         _b32loop
 
-_b4tail:
-	// do remaining words if possible
+_b4tail:  // do remaining words if possible
 	MOVW savedts-4(SP), TS
 	ADD  $3, TS, TMP
 
@@ -115,8 +109,7 @@ _b4loop:
 	MOVW.W TMP1, -4(TE)   // pre-indexed
 	B      _b4loop
 
-_b1tail:
-	// remaining bytes
+_b1tail:  // remaining bytes
 	CMP TE, TS
 	BEQ _return
 
@@ -128,8 +121,7 @@ _forward:
 	CMP $4, N    // need at least 4 bytes to copy
 	BLT _f1tail
 
-_f4align:
-	// align destination on 4
+_f4align:  // align destination on 4
 	AND.S $3, TS, TMP
 	BEQ   _f4aligned
 
@@ -137,8 +129,7 @@ _f4align:
 	MOVBU.P TMP, 1(TS)   // implicit write back
 	B       _f4align
 
-_f4aligned:
-	// is source now aligned?
+_f4aligned:  // is source now aligned?
 	AND.S $3, FROM, TMP
 	BNE   _funaligned
 

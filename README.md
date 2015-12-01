@@ -72,6 +72,7 @@ You should only run `asmfmt` on files that are assembler files. Assembler files 
 * It will eliminate multiple blank lines.
 * Forced newline before comments, except when preceded by label or another comment.
 * Forced newline before labels, except when preceded by comment.
+* Labels are on a separate lines, except for comments.
 * Retains block breaks (newline between blocks).
 * It will convert single line block comments to line comments.
 * Line comments have a space after `//`, except if comment starts with `+`.
