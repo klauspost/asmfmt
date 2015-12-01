@@ -1894,7 +1894,7 @@ TEXT p256SqrInternal(SB), NOSPLIT, $0
 	CMOVQCS acc6, t2;             \
 	CMOVQCS acc7, t3
 
-	// ---------------------------------------
+// ---------------------------------------
 #define p256AddInline  \
 	XORQ    mul0, mul0;           \
 	ADDQ    t0, acc4;             \
@@ -1916,7 +1916,7 @@ TEXT p256SqrInternal(SB), NOSPLIT, $0
 	CMOVQCS acc6, t2;             \
 	CMOVQCS acc7, t3
 
-	// ---------------------------------------
+// ---------------------------------------
 #define LDacc(src) MOVQ src(8*0), acc4; MOVQ src(8*1), acc5; MOVQ src(8*2), acc6; MOVQ src(8*3), acc7
 #define LDt(src)   MOVQ src(8*0), t0; MOVQ src(8*1), t1; MOVQ src(8*2), t2; MOVQ src(8*3), t3
 #define ST(dst)	MOVQ acc4, dst(8*0); MOVQ acc5, dst(8*1); MOVQ acc6, dst(8*2); MOVQ acc7, dst(8*3)

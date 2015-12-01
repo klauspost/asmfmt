@@ -257,7 +257,7 @@ func (f *fstate) addLine(b []byte) error {
 		f.lastLabel = false
 	}()
 	f.queued = append(f.queued, *st)
-	if st.isTerminator() {
+	if st.isTerminator() || multiLineEnd(f.queued) {
 		// Terminators should always be at level 1
 		f.indentation = 1
 		err := f.flush()
@@ -441,6 +441,19 @@ func (st statement) define() string {
 		return r
 	}
 	return ""
+}
+
+// multiLineEnd will return true if the last statement terminates a multiLine
+// statement.
+func multiLineEnd(s []statement) bool {
+	if len(s) < 2 {
+		return false
+	}
+	s = s[len(s)-2:]
+	if s[0].continued && !s[1].continued {
+		return true
+	}
+	return false
 }
 
 // formatStatements will format a slice of statements and return each line
