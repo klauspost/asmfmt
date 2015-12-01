@@ -312,7 +312,7 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 	startcom := strings.Index(s, "//")
 	if startcom > 0 {
 		st.comment = strings.TrimSpace(s[startcom+2:])
-		s = s[:startcom]
+		s = strings.TrimSpace(s[:startcom])
 	}
 
 	// Handle defined macro calls

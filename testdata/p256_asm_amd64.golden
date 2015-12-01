@@ -2071,7 +2071,7 @@ TEXT ·p256PointAddAffineAsm(SB), 0, $512-96
 	CALL p256MulInternal(SB)  // u1 * hˆ2
 	ST (h)
 
-	p256MulBy2Inline			       // u1 * hˆ2 * 2, inline
+	p256MulBy2Inline          // u1 * hˆ2 * 2, inline
 	LDacc (rsqr)
 	CALL p256SubInternal(SB)  // rˆ2 - u1 * hˆ2 * 2
 
@@ -2338,7 +2338,7 @@ TEXT ·p256PointAddAsm(SB), 0, $672-76
 	CALL p256MulInternal(SB)  // hˆ2 * u1
 	ST (u2)
 
-	p256MulBy2Inline	         // u1 * hˆ2 * 2, inline
+	p256MulBy2Inline          // u1 * hˆ2 * 2, inline
 	LDacc (rsqr)
 	CALL p256SubInternal(SB)  // rˆ2 - u1 * hˆ2 * 2
 
