@@ -2468,7 +2468,7 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 	p256AddInline
 	STt (m)
 
-	// //////////////////////
+	////////////////////////
 	LDacc (y)
 	p256MulBy2Inline
 	t2acc
@@ -2502,7 +2502,7 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 	SHRQ $1, acc7:mul0
 	ST (y)
 
-	// ///////////////////////
+	/////////////////////////
 	LDacc (x)
 	LDt (s)
 	CALL p256MulInternal(SB)
@@ -2540,7 +2540,7 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 	MOVQ acc6, (16*2 + 8*2)(AX)
 	MOVQ acc7, (16*2 + 8*3)(AX)
 
-	// /////////////////////
+	///////////////////////
 	MOVQ $0, rptr
 
 	RET
