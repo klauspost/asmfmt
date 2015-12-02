@@ -369,6 +369,7 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 	}
 
 	s = strings.TrimPrefix(s, st.instruction)
+	st.instruction = strings.Replace(st.instruction, "\t", " ", -1)
 	s = strings.TrimSpace(s)
 
 	st.setParams(s)
