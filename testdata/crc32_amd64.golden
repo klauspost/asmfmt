@@ -156,9 +156,9 @@ loopback64:
 	PXOR X14, X4
 
 	ADDQ $0x40, DI
-	ADDQ $64, SI     // buf+=64
-	SUBQ $64, CX     // len-=64
-	CMPQ CX, $64     // Less than 64 bytes left?
+	ADDQ $64, SI    // buf+=64
+	SUBQ $64, CX    // len-=64
+	CMPQ CX, $64    // Less than 64 bytes left?
 	JGE  loopback64
 
 	// Fold result into a single register (X1)

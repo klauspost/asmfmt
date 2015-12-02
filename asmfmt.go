@@ -371,15 +371,8 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 	s = strings.TrimPrefix(s, st.instruction)
 	s = strings.TrimSpace(s)
 
-	// Split parameters
-	fields = strings.Split(s, ",")
-	st.params = make([]string, 0, len(fields))
-	for i := range fields {
-		field := strings.TrimSpace(fields[i])
-		if len(field) > 0 {
-			st.params = append(st.params, field)
-		}
-	}
+	st.setParams(s)
+
 	// Remove trailing ;
 	if len(st.params) > 0 {
 		st.params[len(st.params)-1] = strings.TrimSuffix(st.params[len(st.params)-1], ";")
@@ -408,6 +401,57 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 	}
 
 	return &st
+}
+
+func (st *statement) setParams(s string) {
+	st.params = make([]string, 0)
+	runes := []rune(s)
+	start := 0
+	lastSlash := false
+	inComment := false
+	lastAst := false
+	for i, r := range runes {
+		switch r {
+		case ',':
+			if inComment {
+				lastSlash = false
+				lastAst = false
+				continue
+			}
+			c := strings.TrimSpace(string(runes[start:i]))
+			if len(c) > 0 {
+				st.params = append(st.params, c)
+			}
+			start = i + 1
+		case '/':
+			if lastAst && inComment {
+				inComment = false
+				lastSlash = false
+			} else {
+				lastSlash = false
+				lastSlash = true
+			}
+		case '*':
+			if lastSlash {
+				inComment = true
+			} else {
+				lastAst = true
+			}
+		case '\t':
+			if !st.isPreProcessor() {
+				runes[i] = ' '
+			}
+		default:
+			lastSlash = false
+			lastAst = false
+		}
+	}
+	if start < len(runes) {
+		c := strings.TrimSpace(string(runes[start:]))
+		if len(c) > 0 {
+			st.params = append(st.params, c)
+		}
+	}
 }
 
 // Return true if this line should be at indentation level 0.
@@ -483,7 +527,11 @@ func formatStatements(s []statement) []string {
 		if l > maxInstr && !x.function {
 			maxInstr = l
 		}
-		l = len(x.params) // Spaces between parameters
+		if len(x.params) > 1 {
+			l = 2 * (len(x.params) - 1) // Spaces between parameters
+		} else {
+			l = 0
+		}
 		// Add parameters
 		for _, y := range x.params {
 			l += len([]rune(y))

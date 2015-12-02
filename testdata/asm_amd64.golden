@@ -89,12 +89,12 @@ ok:
 	// save m0 to g0->m
 	MOVQ AX, g_m(CX)
 
-	CLD                     // convention is D is always left cleared
+	CLD                    // convention is D is always left cleared
 	CALL runtime·check(SB)
 
-	MOVL 16(SP), AX             // copy argc
+	MOVL 16(SP), AX            // copy argc
 	MOVL AX, 0(SP)
-	MOVQ 24(SP), AX             // copy argv
+	MOVQ 24(SP), AX            // copy argv
 	MOVQ AX, 8(SP)
 	CALL runtime·args(SB)
 	CALL runtime·osinit(SB)
@@ -382,7 +382,7 @@ TEXT ·reflectcall(SB), NOSPLIT, $0-24
 	JMP     AX
 
 #define CALLFN(NAME, MAXSIZE) \
-TEXT NAME(SB), WRAPPER, $MAXSIZE-24;\
+TEXT NAME(SB), WRAPPER, $MAXSIZE-24; \
 	NO_LOCAL_POINTERS;                    \
 	/* copy arguments to stack */         \
 	MOVQ       argptr+8(FP), SI;          \
@@ -886,16 +886,16 @@ TEXT runtime·cputicks(SB), NOSPLIT, $0-0
 
 // hash function using AES hardware instructions
 TEXT runtime·aeshash(SB), NOSPLIT, $0-32
-	MOVQ p+0(FP), AX              // ptr to data
-	MOVQ s+8(FP), CX              // size
+	MOVQ p+0(FP), AX             // ptr to data
+	MOVQ s+8(FP), CX             // size
 	JMP  runtime·aeshashbody(SB)
 
 TEXT runtime·aeshashstr(SB), NOSPLIT, $0-32
 	MOVQ p+0(FP), AX // ptr to string struct
 
 	// s+8(FP) is ignored, it is always sizeof(String)
-	MOVQ 8(AX), CX                // length of string
-	MOVQ (AX), AX                 // string data
+	MOVQ 8(AX), CX               // length of string
+	MOVQ (AX), AX                // string data
 	JMP  runtime·aeshashbody(SB)
 
 // AX: data
@@ -928,7 +928,7 @@ aesloopend:
 // 0-15 bytes
 aessmall:
 	TESTQ CX, CX
-	JE    finalize  // 0 bytes
+	JE    finalize // 0 bytes
 
 	CMPB AX, $0xf0
 	JA   highpartial
@@ -1218,7 +1218,7 @@ TEXT runtime·cmpbody(SB), NOSPLIT, $0-0
 	JEQ     cmp_allsame
 	CMPQ    BX, DX
 	MOVQ    DX, BP
-	CMOVQLT BX, BP       // BP = min(alen, blen) = # of bytes to compare
+	CMOVQLT BX, BP      // BP = min(alen, blen) = # of bytes to compare
 	CMPQ    BP, $8
 	JB      cmp_small
 
@@ -1229,8 +1229,8 @@ cmp_loop:
 	MOVOU    (DI), X1
 	PCMPEQB  X0, X1
 	PMOVMSKB X1, AX
-	XORQ     $0xffff, AX     // convert EQ to NE
-	JNE      cmp_diff16      // branch if at least one byte is not equal
+	XORQ     $0xffff, AX    // convert EQ to NE
+	JNE      cmp_diff16     // branch if at least one byte is not equal
 	ADDQ     $16, SI
 	ADDQ     $16, DI
 	SUBQ     $16, BP
@@ -1274,8 +1274,8 @@ cmp_diff8:
 
 // 0-7 bytes in common
 cmp_small:
-	LEAQ (BP*8), CX   // bytes left -> bits left
-	NEGQ CX           // - bits lift (== 64 - bits left mod 64)
+	LEAQ (BP*8), CX  // bytes left -> bits left
+	NEGQ CX          // - bits lift (== 64 - bits left mod 64)
 	JEQ  cmp_allsame
 
 	// load bytes of a into high bytes of AX
@@ -2272,5 +2272,5 @@ TEXT _cgo_topofstack(SB), NOSPLIT, $0
 // The top-most function running on a goroutine
 // returns to goexit+PCQuantum.
 TEXT runtime·goexit(SB), NOSPLIT, $0-0
-	BYTE $0x90                // NOP
-	CALL runtime·goexit1(SB)  // does not return
+	BYTE $0x90               // NOP
+	CALL runtime·goexit1(SB) // does not return

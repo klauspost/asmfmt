@@ -361,10 +361,10 @@ TEXT runtime·bsdthread_start(SB), NOSPLIT, $0
 	ADDL $7, DI        // m0 is LDT#7. count up.
 
 	// setldt(tls#, &tls, sizeof tls)
-	PUSHAL                     // save registers
-	PUSHL  $32                 // sizeof tls
-	PUSHL  BP                  // &tls
-	PUSHL  DI                  // tls #
+	PUSHAL                    // save registers
+	PUSHL  $32                // sizeof tls
+	PUSHL  BP                 // &tls
+	PUSHL  DI                 // tls #
 	CALL   runtime·setldt(SB)
 	POPL   AX
 	POPL   AX
@@ -375,9 +375,9 @@ TEXT runtime·bsdthread_start(SB), NOSPLIT, $0
 	get_tls(BP)
 	MOVL AX, g(BP)
 	MOVL DX, g_m(AX)
-	MOVL BX, m_procid(DX)        // m->procid = thread port (for debuggers)
-	CALL runtime·stackcheck(SB)  // smashes AX
-	CALL CX                      // fn()
+	MOVL BX, m_procid(DX)       // m->procid = thread port (for debuggers)
+	CALL runtime·stackcheck(SB) // smashes AX
+	CALL CX                     // fn()
 	CALL runtime·exit1(SB)
 	RET
 
@@ -417,7 +417,7 @@ TEXT runtime·bsdthread_register(SB), NOSPLIT, $40
 TEXT runtime·sysenter(SB), NOSPLIT, $0
 	POPL DX
 	MOVL SP, CX
-	BYTE $0x0F; BYTE $0x34  // SYSENTER
+	BYTE $0x0F; BYTE $0x34 // SYSENTER
 
 	// returns to DX with SP set to CX
 

@@ -33,14 +33,14 @@
 // take care and double check with objdump.
 #define FROM	R11
 #define N	R12
-#define TMP	R12  // N and TMP don't overlap
+#define TMP	R12 // N and TMP don't overlap
 #define TMP1	R5
 
 #define RSHIFT	R5
 #define LSHIFT	R6
 #define OFFSET	R7
 
-#define BR0	R0  // shared with TS
+#define BR0	R0 // shared with TS
 #define BW0	R1
 #define BR1	R1
 #define BW1	R2
@@ -56,7 +56,7 @@
 #define FW2	R3
 #define FR2	R4
 #define FW3	R4
-#define FR3	R8  // shared with TE
+#define FR3	R8 // shared with TE
 
 TEXT runtime·memmove(SB), NOSPLIT, $4-12
 _memmove:
@@ -64,14 +64,14 @@ _memmove:
 	MOVW from+4(FP), FROM
 	MOVW n+8(FP), N
 
-	ADD N, TS, TE// to end pointer
+	ADD N, TS, TE // to end pointer
 
 	CMP FROM, TS
 	BLS _forward
 
 _back:
-	ADD N, FROM  // from end pointer
-	CMP $4, N    // need at least 4 bytes to copy
+	ADD N, FROM // from end pointer
+	CMP $4, N   // need at least 4 bytes to copy
 	BLT _b1tail
 
 _b4align:// align destination on 4
@@ -118,7 +118,7 @@ _b1tail:// remaining bytes
 	B       _b1tail
 
 _forward:
-	CMP $4, N    // need at least 4 bytes to copy
+	CMP $4, N   // need at least 4 bytes to copy
 	BLT _f1tail
 
 _f4align:// align destination on 4
@@ -183,7 +183,7 @@ _bunaligned:
 	MOVW.GT $8, LSHIFT
 	MOVW.GT $3, OFFSET
 
-	ADD $16, TS, TMP// do 16-byte chunks if possible
+	ADD $16, TS, TMP // do 16-byte chunks if possible
 	CMP TMP, TE
 	BLS _b1tail
 
@@ -231,7 +231,7 @@ _funaligned:
 	MOVW.GT $8, LSHIFT
 	MOVW.GT $1, OFFSET
 
-	SUB $16, TE, TMP// do 16-byte chunks if possible
+	SUB $16, TE, TMP // do 16-byte chunks if possible
 	CMP TMP, TS
 	BHS _f1tail
 

@@ -23,21 +23,21 @@ TEXT ·galMulSSSE3Xor(SB), 7, $0
 	JEQ    done_xor
 
 loopback_xor:
-	MOVOU  (SI), X0      // in[x]
-	MOVOU  (DX), X4      // out[x]
-	MOVOU  X0, X1        // in[x]
-	MOVOU  X6, X2        // low copy
-	MOVOU  X7, X3        // high copy
-	PSRLQ  $4, X1        // X1: high input
-	PAND   X8, X0        // X0: low input
-	PAND   X8, X1        // X0: high input
-	PSHUFB X0, X2        // X2: mul low part
-	PSHUFB X1, X3        // X3: mul high part
-	PXOR   X2, X3        // X3: Result
-	PXOR   X4, X3        // X3: Result xor existing out
-	MOVOU  X3, (DX)      // Store
-	ADDQ   $16, SI       // in+=16
-	ADDQ   $16, DX       // out+=16
+	MOVOU  (SI), X0     // in[x]
+	MOVOU  (DX), X4     // out[x]
+	MOVOU  X0, X1       // in[x]
+	MOVOU  X6, X2       // low copy
+	MOVOU  X7, X3       // high copy
+	PSRLQ  $4, X1       // X1: high input
+	PAND   X8, X0       // X0: low input
+	PAND   X8, X1       // X0: high input
+	PSHUFB X0, X2       // X2: mul low part
+	PSHUFB X1, X3       // X3: mul high part
+	PXOR   X2, X3       // X3: Result
+	PXOR   X4, X3       // X3: Result xor existing out
+	MOVOU  X3, (DX)     // Store
+	ADDQ   $16, SI      // in+=16
+	ADDQ   $16, DX      // out+=16
 	SUBQ   $1, R9
 	JNZ    loopback_xor
 
@@ -62,19 +62,19 @@ TEXT ·galMulSSSE3(SB), 7, $0
 	JEQ    done
 
 loopback:
-	MOVOU  (SI), X0  // in[x]
-	MOVOU  X0, X1    // in[x]
-	MOVOU  X6, X2    // low copy
-	MOVOU  X7, X3    // high copy
-	PSRLQ  $4, X1    // X1: high input
-	PAND   X8, X0    // X0: low input
-	PAND   X8, X1    // X0: high input
-	PSHUFB X0, X2    // X2: mul low part
-	PSHUFB X1, X3    // X3: mul high part
-	PXOR   X2, X3    // X3: Result
-	MOVOU  X3, (DX)  // Store
-	ADDQ   $16, SI   // in+=16
-	ADDQ   $16, DX   // out+=16
+	MOVOU  (SI), X0 // in[x]
+	MOVOU  X0, X1   // in[x]
+	MOVOU  X6, X2   // low copy
+	MOVOU  X7, X3   // high copy
+	PSRLQ  $4, X1   // X1: high input
+	PAND   X8, X0   // X0: low input
+	PAND   X8, X1   // X0: high input
+	PSHUFB X0, X2   // X2: mul low part
+	PSHUFB X1, X3   // X3: mul high part
+	PXOR   X2, X3   // X3: Result
+	MOVOU  X3, (DX) // Store
+	ADDQ   $16, SI  // in+=16
+	ADDQ   $16, DX  // out+=16
 	SUBQ   $1, R9
 	JNZ    loopback
 

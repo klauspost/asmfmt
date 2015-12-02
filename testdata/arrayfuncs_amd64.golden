@@ -592,9 +592,9 @@ TEXT ·minSliceElement(SB), 7, $0
 	SUBQ  $1, DX
 
 	UNPCKLPD X0, X0
-	MOVQ     DX, R10       // R10: len(out) -1
-	SHRQ     $2, DX        // DX: (len(out) - 1) / 4
-	ANDQ     $3, R10       // R10: (len(out) -1 ) % 4
+	MOVQ     DX, R10      // R10: len(out) -1
+	SHRQ     $2, DX       // DX: (len(out) - 1) / 4
+	ANDQ     $3, R10      // R10: (len(out) -1 ) % 4
 	MOVAPD   X0, X1
 	CMPQ     DX, $0
 	JEQ      remain_min_e
@@ -634,9 +634,9 @@ TEXT ·maxSliceElement(SB), 7, $0
 	SUBQ  $1, DX
 
 	UNPCKLPD X0, X0
-	MOVQ     DX, R10       // R10: len(out) -1
-	SHRQ     $2, DX        // DX: (len(out) - 1) / 4
-	ANDQ     $3, R10       // R10: (len(out) -1 ) % 4
+	MOVQ     DX, R10      // R10: len(out) -1
+	SHRQ     $2, DX       // DX: (len(out) - 1) / 4
+	ANDQ     $3, R10      // R10: (len(out) -1 ) % 4
 	MOVAPD   X0, X1
 	CMPQ     DX, $0
 	JEQ      remain_max_e
@@ -674,9 +674,9 @@ TEXT ·sliceSum(SB), 7, $0
 	XORPD X0, X0          // Initial value
 	XORPD X1, X1          // Initial value
 
-	MOVQ DX, R10     // R10: len(out) -1
-	SHRQ $2, DX      // DX: (len(out) - 1) / 4
-	ANDQ $3, R10     // R10: (len(out) -1 ) % 4
+	MOVQ DX, R10    // R10: len(out) -1
+	SHRQ $2, DX     // DX: (len(out) - 1) / 4
+	ANDQ $3, R10    // R10: (len(out) -1 ) % 4
 	CMPQ DX, $0
 	JEQ  remain_sum
 

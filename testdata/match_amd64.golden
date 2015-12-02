@@ -50,7 +50,7 @@ TEXT ·find4SSE4s(SB), 7, $0
 	MOVD (R8), X0                 // X0: needle
 	PXOR X7, X7                   // X7: Zero
 
-	SHRQ $4, R10      // len(haystack)/16
+	SHRQ $4, R10     // len(haystack)/16
 	CMPQ R10, $0
 	JEQ  done_find4s
 
@@ -97,7 +97,7 @@ TEXT ·find8SSE4(SB), 7, $0
 	PSRLW   $8, X5   // 0xffff >> 8 = 0x00ff, lower byte mask per word (shifts in zeros)
 	PSLLW   $8, X6   // 0xffff << 8  = 0xff00, upper byte mask per word.
 
-	SHRQ $4, R10     // len(haystack)/16
+	SHRQ $4, R10    // len(haystack)/16
 	CMPQ R10, $0
 	JZ   done_find8
 	SUBQ $1, R10
@@ -201,7 +201,7 @@ TEXT ·find8SSE4s(SB), 7, $0
 	PSRLW   $8, X5   // 0xffff >> 8 = 0x00ff, lower byte mask per word (shifts in zeros)
 	PSLLW   $8, X6   // 0xffff << 8  = 0xff00, upper byte mask per word.
 
-	SHRQ $4, R10      // len(haystack)/16
+	SHRQ $4, R10     // len(haystack)/16
 	CMPQ R10, $0
 	JZ   done_find8s
 	SUBQ $1, R10
@@ -299,8 +299,8 @@ TEXT ·matchLenSSE4(SB), 7, $0
 	XORQ R11, R11        // match length
 
 	MOVQ R10, R12
-	SHRQ $4, R10             // max/16
-	ANDQ $15, R12            // max & 15
+	SHRQ $4, R10            // max/16
+	ANDQ $15, R12           // max & 15
 	CMPQ R10, $0
 	JEQ  matchlen_verysmall
 

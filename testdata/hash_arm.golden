@@ -1,54 +1,54 @@
 #include "textflag.h"
 #define R10 g
-#define ROUND()  \
-	ADD.S R2, R0, R0;      \
-	ADC   R3, R1, R1;      \
-	EOR   R2<<13, R0, R8;  \
-	EOR   R3>>19, R8, R8;  \
-	EOR   R2>>19, R1, R11; \
-	EOR   R3<<13, R11, R11;\
-	ADD.S R6, R4, R4;      \
-	ADC   R7, R5, R5;      \
-	EOR   R6<<16, R4, R2;  \
-	EOR   R7>>16, R2, R2;  \
-	EOR   R6>>16, R5, R3;  \
-	EOR   R7<<16, R3, R3;  \
-	ADD.S R2, R1, R1;      \
-	ADC   R3, R0, R0;      \
-	EOR   R2<<21, R1, R6;  \
-	EOR   R3>>11, R6, R6;  \
-	EOR   R2>>11, R0, R7;  \
-	EOR   R3<<21, R7, R7;  \
-	ADD.S R8, R4, R4;      \
-	ADC   R11, R5, R5;     \
-	EOR   R8<<17, R4, R2;  \
-	EOR   R11>>15, R2, R2; \
-	EOR   R8>>15, R5, R3;  \
-	EOR   R11<<17, R3, R3; \
-	ADD.S R2, R1, R1;      \
-	ADC   R3, R0, R0;      \
-	EOR   R2<<13, R1, R8;  \
-	EOR   R3>>19, R8, R8;  \
-	EOR   R2>>19, R0, R11; \
-	EOR   R3<<13, R11, R11;\
-	ADD.S R6, R5, R5;      \
-	ADC   R7, R4, R4;      \
-	EOR   R6<<16, R5, R2;  \
-	EOR   R7>>16, R2, R2;  \
-	EOR   R6>>16, R4, R3;  \
-	EOR   R7<<16, R3, R3;  \
-	ADD.S R2, R0, R0;      \
-	ADC   R3, R1, R1;      \
-	EOR   R2<<21, R0, R6;  \
-	EOR   R3>>11, R6, R6;  \
-	EOR   R2>>11, R1, R7;  \
-	EOR   R3<<21, R7, R7;  \
-	ADD.S R8, R5, R5;      \
-	ADC   R11, R4, R4;     \
-	EOR   R8<<17, R5, R2;  \
-	EOR   R11>>15, R2, R2; \
-	EOR   R8>>15, R4, R3;  \
-	EOR   R11<<17, R3, R3; \
+#define ROUND() \
+	ADD.S R2, R0, R0;       \
+	ADC   R3, R1, R1;       \
+	EOR   R2<<13, R0, R8;   \
+	EOR   R3>>19, R8, R8;   \
+	EOR   R2>>19, R1, R11;  \
+	EOR   R3<<13, R11, R11; \
+	ADD.S R6, R4, R4;       \
+	ADC   R7, R5, R5;       \
+	EOR   R6<<16, R4, R2;   \
+	EOR   R7>>16, R2, R2;   \
+	EOR   R6>>16, R5, R3;   \
+	EOR   R7<<16, R3, R3;   \
+	ADD.S R2, R1, R1;       \
+	ADC   R3, R0, R0;       \
+	EOR   R2<<21, R1, R6;   \
+	EOR   R3>>11, R6, R6;   \
+	EOR   R2>>11, R0, R7;   \
+	EOR   R3<<21, R7, R7;   \
+	ADD.S R8, R4, R4;       \
+	ADC   R11, R5, R5;      \
+	EOR   R8<<17, R4, R2;   \
+	EOR   R11>>15, R2, R2;  \
+	EOR   R8>>15, R5, R3;   \
+	EOR   R11<<17, R3, R3;  \
+	ADD.S R2, R1, R1;       \
+	ADC   R3, R0, R0;       \
+	EOR   R2<<13, R1, R8;   \
+	EOR   R3>>19, R8, R8;   \
+	EOR   R2>>19, R0, R11;  \
+	EOR   R3<<13, R11, R11; \
+	ADD.S R6, R5, R5;       \
+	ADC   R7, R4, R4;       \
+	EOR   R6<<16, R5, R2;   \
+	EOR   R7>>16, R2, R2;   \
+	EOR   R6>>16, R4, R3;   \
+	EOR   R7<<16, R3, R3;   \
+	ADD.S R2, R0, R0;       \
+	ADC   R3, R1, R1;       \
+	EOR   R2<<21, R0, R6;   \
+	EOR   R3>>11, R6, R6;   \
+	EOR   R2>>11, R1, R7;   \
+	EOR   R3<<21, R7, R7;   \
+	ADD.S R8, R5, R5;       \
+	ADC   R11, R4, R4;      \
+	EOR   R8<<17, R5, R2;   \
+	EOR   R11>>15, R2, R2;  \
+	EOR   R8>>15, R4, R3;   \
+	EOR   R11<<17, R3, R3;  \
 
 // Hash(k0, k1 uint64, b []byte) uint64
 TEXT ·Hash(SB), NOSPLIT, $8-36
