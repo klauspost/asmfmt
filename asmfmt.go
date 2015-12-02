@@ -100,12 +100,59 @@ func (f *fstate) addLine(b []byte) error {
 		}
 	}
 
-	if strings.Contains(s, "/*") {
+	// Comment only line.
+	if strings.HasPrefix(s, "//") {
+		// Non-comment content is now added.
+		defer func() {
+			f.anyContents = true
+			f.lastEmpty = false
+			f.lastStar = false
+		}()
+
+		s = strings.TrimPrefix(s, "//")
+
+		err := f.flush()
+		if err != nil {
+			return err
+		}
+
+		err = f.newLine()
+		if err != nil {
+			return err
+		}
+
+		err = f.indent()
+		if err != nil {
+			return err
+		}
+
+		// Preserve whitespace if the first character after the comment
+		// is a whitespace
+		ts := strings.TrimSpace(s)
+		if (ts != s && len(ts) > 0) || (len(s) > 0 && strings.ContainsAny(string(s[0]), `+/`)) {
+			_, err = fmt.Fprintln(f.out, "//"+s)
+		} else if len(ts) > 0 {
+			// Insert a space before the comment
+			_, err = fmt.Fprintln(f.out, "//", s)
+		} else {
+			_, err = fmt.Fprintln(f.out, "//")
+		}
+		if err != nil {
+			return err
+		}
+		f.lastComment = true
+		return nil
+	}
+
+	if strings.Contains(s, "/*") && !strings.HasSuffix(s, `\`) {
 		starts := strings.Index(s, "/*")
 		ends := strings.Index(s, "*/")
 		pre := s[:starts]
 		pre = strings.TrimSpace(pre)
 		if len(pre) > 0 {
+			if strings.HasSuffix(s, `\`) {
+				goto exitcomm
+			}
 			// Add items before the comment section as a line.
 			if ends > starts && ends >= len(s)-2 {
 				comm := strings.TrimSpace(s[starts+2 : ends])
@@ -147,6 +194,7 @@ func (f *fstate) addLine(b []byte) error {
 		f.out.WriteString(s + "\n")
 		return nil
 	}
+exitcomm:
 
 	if len(s) == 0 {
 		err := f.flush()
@@ -173,43 +221,6 @@ func (f *fstate) addLine(b []byte) error {
 		f.lastStar = false
 	}()
 
-	// Comment only line.
-	if strings.HasPrefix(s, "//") {
-		s = strings.TrimPrefix(s, "//")
-
-		err := f.flush()
-		if err != nil {
-			return err
-		}
-
-		err = f.newLine()
-		if err != nil {
-			return err
-		}
-
-		err = f.indent()
-		if err != nil {
-			return err
-		}
-
-		// Preserve whitespace if the first character after the comment
-		// is a whitespace
-		ts := strings.TrimSpace(s)
-		if (ts != s && len(ts) > 0) || (len(s) > 0 && strings.ContainsAny(string(s[0]), `+/`)) {
-			_, err = fmt.Fprintln(f.out, "//"+s)
-		} else if len(ts) > 0 {
-			// Insert a space before the comment
-			_, err = fmt.Fprintln(f.out, "//", s)
-		} else {
-			_, err = fmt.Fprintln(f.out, "//")
-		}
-		if err != nil {
-			return err
-		}
-		f.lastComment = true
-		return nil
-	}
-
 	defer func() {
 		f.lastComment = false
 	}()
@@ -228,14 +239,14 @@ func (f *fstate) addLine(b []byte) error {
 	}
 
 	// Move anything that isn't a comment to the next line
-	if st.isLabel() && len(st.params) > 0 {
+	if st.isLabel() && len(st.params) > 0 && !st.continued {
 		idx := strings.Index(s, ":")
 		st = newStatement(s[:idx+1], f.defines)
 		defer f.addLine([]byte(s[idx+1:]))
 	}
 
 	// Should this line be at level 0?
-	if st.level0() {
+	if st.level0() && !(st.continued && f.lastContinued) {
 		err := f.flush()
 		if err != nil {
 			return err
@@ -264,7 +275,7 @@ func (f *fstate) addLine(b []byte) error {
 		f.lastLabel = false
 	}()
 	f.queued = append(f.queued, *st)
-	if st.isTerminator() || f.lastContinued && !st.continued {
+	if st.isTerminator() || (f.lastContinued && !st.continued) {
 		// Terminators should always be at level 1
 		f.indentation = 1
 		err := f.flush()
@@ -342,9 +353,12 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 			st.function = true
 		}
 	}
+	if strings.HasPrefix(s, "/*") {
+		st.function = true
+	}
 	// We may not have it defined as a macro, if defined in an external
 	// .h file, so we try to detect the remaining ones.
-	if strings.Contains(st.instruction, "(") {
+	if strings.ContainsAny(st.instruction, "(_") {
 		st.function = true
 	}
 	if len(st.params) > 0 && strings.HasPrefix(st.params[0], "(") {
@@ -386,6 +400,11 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 			}
 			st.continued = true
 		}
+	}
+	if strings.HasSuffix(st.instruction, `\`) {
+		i := strings.TrimSuffix(st.instruction, `\`)
+		st.instruction = strings.TrimSpace(i)
+		st.continued = true
 	}
 
 	return &st
