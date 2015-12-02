@@ -312,13 +312,13 @@ TEXT ·mod_sqr(SB), 7, $0-24
 	SBC.CC   $0, t1, t1    ;                                                                \
 
 #define MOD_SHIFT_0_TO_31_PROC(shift) \
-	MOVW    $-1, R12 ;        \
-	MOVW    $0, R11 ;         \
-	MOVM.IB (R13), [R0, R1] ; \
-	MOD_SHIFT_0_TO_31(shift, R4, R5, R0, R1, R12, R11)	;\
-	MOVW    R4, ret+8(FP) ;   \
-	MOVW    R5, ret+12(FP) ;  \
-	RET     ;                 \
+	MOVW    $-1, R12 ;                                   \
+	MOVW    $0, R11 ;                                    \
+	MOVM.IB (R13), [R0, R1] ;                            \
+	MOD_SHIFT_0_TO_31(shift, R4, R5, R0, R1, R12, R11)	; \
+	MOVW    R4, ret+8(FP) ;                              \
+	MOVW    R5, ret+12(FP) ;                             \
+	RET     ;                                            \
 
 TEXT ·mod_shift3(SB), 7, $0-16
 	MOD_SHIFT_0_TO_31_PROC(3)
@@ -393,12 +393,12 @@ TEXT ·mod_shift30(SB), 7, $0-16
 	SBC.CC   $0, t1, t1    ;                                                        \
 
 #define MOD_SHIFT_32_TO_63_PROC(shift) \
-	MOVW    $-1, R12 ;        \
-	MOVM.IB (R13), [R0, R1] ; \
-	MOD_SHIFT_32_TO_63(shift, R4, R5, R0, R1, R12)	;\
-	MOVW    R4, ret+8(FP) ;   \
-	MOVW    R5, ret+12(FP) ;  \
-	RET     ;                 \
+	MOVW    $-1, R12 ;                               \
+	MOVM.IB (R13), [R0, R1] ;                        \
+	MOD_SHIFT_32_TO_63(shift, R4, R5, R0, R1, R12)	; \
+	MOVW    R4, ret+8(FP) ;                          \
+	MOVW    R5, ret+12(FP) ;                         \
+	RET     ;                                        \
 
 TEXT ·mod_shift33(SB), 7, $0-16
 	MOD_SHIFT_32_TO_63_PROC(33)
@@ -461,13 +461,13 @@ TEXT ·mod_shift63(SB), 7, $0-16
 	SBC.CC   $0, t1, t1   ;                                                        \
 
 #define MOD_SHIFT_64_TO_95_PROC(shift) \
-	MOVW    $-1, R12 ;        \
-	MOVW    $0, R11 ;         \
-	MOVM.IB (R13), [R0, R1] ; \
-	MOD_SHIFT_64_TO_95(shift, R4, R5, R0, R1, R12, R11)	;\
-	MOVW    R4, ret+8(FP) ;   \
-	MOVW    R5, ret+12(FP) ;  \
-	RET     ;                 \
+	MOVW    $-1, R12 ;                                    \
+	MOVW    $0, R11 ;                                     \
+	MOVM.IB (R13), [R0, R1] ;                             \
+	MOD_SHIFT_64_TO_95(shift, R4, R5, R0, R1, R12, R11)	; \
+	MOVW    R4, ret+8(FP) ;                               \
+	MOVW    R5, ret+12(FP) ;                              \
+	RET     ;                                             \
 
 TEXT ·mod_shift66(SB), 7, $0-16
 	MOD_SHIFT_64_TO_95_PROC(66)

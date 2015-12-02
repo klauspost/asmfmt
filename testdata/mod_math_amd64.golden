@@ -25,9 +25,9 @@ NEGQ    R8
 // Compute x = x + y mod p, using t
 // Preserves y, p
 #define MOD_ADD(x, y, t, p, LABEL) \
-	MOVQ p, t; \
-	SUBQ y, t; \
-	MOD_SUB(x, t, p, LABEL);\
+	MOVQ p, t;               \
+	SUBQ y, t;               \
+	MOD_SUB(x, t, p, LABEL); \
 
 TEXT ·mod_sub(SB), 7, $0-24
 	MOVQ $MOD_P, R8
@@ -94,24 +94,24 @@ TEXT ·mod_sqr(SB), 7, $0-16
 	RET
 
 #define MOD_SHIFT_0_TO_31(x, shift, t0, t1, p, label) \
-	MOVQ x, t0;            \
-	/* xmid_xlow := x << shift, (xmid, xlow) */\
-	SHLQ $shift, x;        \
-	/* xhigh := uint32(x >> (64 - shift)) */\
-	SHRQ $(64-shift), t0 ; \
-	/* t := uint64(0xFFFFFFFF-xhigh)<<32 + uint64(xhigh+1), (2^32 - 1 - xhigh, xhigh + 1) */\
-	MOVL t0, t1;           \
-	SHLQ $32, t0;          \
-	SUBQ t1, t0;           \
-	/* r := xmid_xlow - t, (xmid, xlow) + (xhigh, -xhigh) */\
-	MOD_ADD(x, t0, t1, p, label);\
+	MOVQ x, t0;                                                                              \
+	/* xmid_xlow := x << shift, (xmid, xlow) */                                              \
+	SHLQ $shift, x;                                                                          \
+	/* xhigh := uint32(x >> (64 - shift)) */                                                 \
+	SHRQ $(64-shift), t0 ;                                                                   \
+	/* t := uint64(0xFFFFFFFF-xhigh)<<32 + uint64(xhigh+1), (2^32 - 1 - xhigh, xhigh + 1) */ \
+	MOVL t0, t1;                                                                             \
+	SHLQ $32, t0;                                                                            \
+	SUBQ t1, t0;                                                                             \
+	/* r := xmid_xlow - t, (xmid, xlow) + (xhigh, -xhigh) */                                 \
+	MOD_ADD(x, t0, t1, p, label);                                                            \
 
 #define MOD_SHIFT_0_TO_31_PROC(shift) \
-	MOVQ x+0(FP), AX;   \
-	MOVQ $MOD_P, R8;    \
-	MOD_SHIFT_0_TO_31(AX, shift, BX, CX, R8, mod_shift/**/shift/**/a);\
-	MOVQ AX, ret+8(FP); \
-	RET  ;              \
+	MOVQ x+0(FP), AX;                                                  \
+	MOVQ $MOD_P, R8;                                                   \
+	MOD_SHIFT_0_TO_31(AX, shift, BX, CX, R8, mod_shift/**/shift/**/a); \
+	MOVQ AX, ret+8(FP);                                                \
+	RET  ;                                                             \
 
 TEXT ·mod_shift3(SB), 7, $0-16
 	MOD_SHIFT_0_TO_31_PROC(3)
@@ -144,33 +144,33 @@ TEXT ·mod_shift30(SB), 7, $0-16
 	MOD_SHIFT_0_TO_31_PROC(30)
 
 #define MOD_SHIFT_32_TO_63(x, shift, t0, t1, t2, p, label) \
-	MOVQ x, t0;             \
-	/* xmid := uint32(x >> (64 - shift)) */\
-	/* xlow := uint32(x << (shift - 32)) */\
-	SHLQ $(shift-32), x;    \
-	/* xhigh := uint32(x >> (96 - shift)) */\
-	SHRQ $(96-shift), t0;   \
-	MOVL x, t1; /* xlow */  \
-	SHRQ $32, x; /* xmid */ \
-	SHLQ $32, t1;           \
-	MOVL x, t2; /* t1 */    \
+	MOVQ x, t0;                              \
+	/* xmid := uint32(x >> (64 - shift)) */  \
+	/* xlow := uint32(x << (shift - 32)) */  \
+	SHLQ $(shift-32), x;                     \
+	/* xhigh := uint32(x >> (96 - shift)) */ \
+	SHRQ $(96-shift), t0;                    \
+	MOVL x, t1; /* xlow */                   \
+	SHRQ $32, x; /* xmid */                  \
+	SHLQ $32, t1;                            \
+	MOVL x, t2; /* t1 */                     \
 	/* t0 := uint64(xmid) << 32// (xmid, 0) */ \
-	SHLQ $32, x; /* t0 */ \
-	/* t1 := uint64(xmid), (0, xmid) */\
-	/* t0 -= t1, (xmid, -xmid) no carry and must be in range 0..p-1 */\
-	SUBQ t2, x;           \
-	/* t1 = uint64(xhigh), (0, xhigh) */\
-	/* r := t0 - t1, (xmid, - xhigh - xmid) */\
-	MOD_SUB(x, t0, p, label/**/1);\
-	/* add (xlow, 0) */   \
-	MOD_ADD(x, t1, t0, p, label/**/2);\
+	SHLQ $32, x; /* t0 */                                              \
+	/* t1 := uint64(xmid), (0, xmid) */                                \
+	/* t0 -= t1, (xmid, -xmid) no carry and must be in range 0..p-1 */ \
+	SUBQ t2, x;                                                        \
+	/* t1 = uint64(xhigh), (0, xhigh) */                               \
+	/* r := t0 - t1, (xmid, - xhigh - xmid) */                         \
+	MOD_SUB(x, t0, p, label/**/1);                                     \
+	/* add (xlow, 0) */                                                \
+	MOD_ADD(x, t1, t0, p, label/**/2);                                 \
 
 #define MOD_SHIFT_32_TO_63_PROC(shift) \
-	MOVQ x+0(FP), AX;   \
-	MOVQ $MOD_P, R8;    \
-	MOD_SHIFT_32_TO_63(AX, shift, BX, CX, DX, R8, mod_shift/**/shift/**/a);\
-	MOVQ AX, ret+8(FP); \
-	RET  ;              \
+	MOVQ x+0(FP), AX;                                                       \
+	MOVQ $MOD_P, R8;                                                        \
+	MOD_SHIFT_32_TO_63(AX, shift, BX, CX, DX, R8, mod_shift/**/shift/**/a); \
+	MOVQ AX, ret+8(FP);                                                     \
+	RET  ;                                                                  \
 
 TEXT ·mod_shift33(SB), 7, $0-16
 	MOD_SHIFT_32_TO_63_PROC(33)
@@ -206,28 +206,28 @@ TEXT ·mod_shift63(SB), 7, $0-16
 	MOD_SHIFT_32_TO_63_PROC(63)
 
 #define MOD_SHIFT_64_TO_95(x, shift, t0, t1, p, label) \
-	MOVQ x, t0;             \
-	/* xlow := uint32(x << (shift - 64)) */\
-	SHLL $(shift - 64), x;  \
-	/* xhigh := uint32(x >> (128 - shift)) */\
-	/* xmid := uint32(x >> (96 - shift)) */\
-	SHRQ $(96 - shift), t0; \
-	/* t0 := uint64(xlow) << 32, (xlow, 0) */\
-	MOVL x, t1;             \
-	SHLQ $32, x;            \
-	/* t1 := uint64(xlow), (0, xlow) */\
-	/* t0 -= t1, (xlow, -xlow) - no carry possible */\
-	SUBQ t1, x;             \
-	/* t1 = uint64(xhigh)<<32 + uint64(xmid), (xhigh, xmid) */\
-	/* r := t0 - t1, (xlow, -xlow) - (xhigh, xmid) */\
-	MOD_SUB(x, t0, p, label);\
+	MOVQ x, t0;                                                \
+	/* xlow := uint32(x << (shift - 64)) */                    \
+	SHLL $(shift - 64), x;                                     \
+	/* xhigh := uint32(x >> (128 - shift)) */                  \
+	/* xmid := uint32(x >> (96 - shift)) */                    \
+	SHRQ $(96 - shift), t0;                                    \
+	/* t0 := uint64(xlow) << 32, (xlow, 0) */                  \
+	MOVL x, t1;                                                \
+	SHLQ $32, x;                                               \
+	/* t1 := uint64(xlow), (0, xlow) */                        \
+	/* t0 -= t1, (xlow, -xlow) - no carry possible */          \
+	SUBQ t1, x;                                                \
+	/* t1 = uint64(xhigh)<<32 + uint64(xmid), (xhigh, xmid) */ \
+	/* r := t0 - t1, (xlow, -xlow) - (xhigh, xmid) */          \
+	MOD_SUB(x, t0, p, label);                                  \
 
 #define MOD_SHIFT_64_TO_95_PROC(shift) \
-	MOVQ x+0(FP), AX;   \
-	MOVQ $MOD_P, R8;    \
-	MOD_SHIFT_64_TO_95(AX, shift, BX, CX, R8, mod_shift/**/shift/**/a);\
-	MOVQ AX, ret+8(FP); \
-	RET  ;              \
+	MOVQ x+0(FP), AX;                                                   \
+	MOVQ $MOD_P, R8;                                                    \
+	MOD_SHIFT_64_TO_95(AX, shift, BX, CX, R8, mod_shift/**/shift/**/a); \
+	MOVQ AX, ret+8(FP);                                                 \
+	RET  ;                                                              \
 
 TEXT ·mod_shift66(SB), 7, $0-16
 	MOD_SHIFT_64_TO_95_PROC(66)

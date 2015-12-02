@@ -520,12 +520,17 @@ func formatStatements(s []statement) []string {
 	res := make([]string, len(s))
 	maxParam := 0
 	maxInstr := 0
+	maxAlone := 0
 	maxComm := 0
 	for _, x := range s {
-		l := len([]rune(x.instruction)) + 1 // Instruction length
+		il := len([]rune(x.instruction)) + 1 // Instruction length
+		l := il
 		// Ignore length if we are a define "function"
 		if l > maxInstr && !x.function {
 			maxInstr = l
+		}
+		if x.function && il > maxAlone {
+			maxAlone = il
 		}
 		if len(x.params) > 1 {
 			l = 2 * (len(x.params) - 1) // Spaces between parameters
@@ -547,6 +552,12 @@ func formatStatements(s []statement) []string {
 		}
 	}
 
+	maxComm += maxInstr
+	maxParam += maxInstr
+	if maxAlone > maxComm {
+		maxComm = maxAlone
+	}
+
 	for i, x := range s {
 		p := strings.Join(x.params, ", ")
 		r := x.instruction
@@ -557,14 +568,14 @@ func formatStatements(s []statement) []string {
 		}
 		r = r + p
 		if len(x.comment) > 0 {
-			it := maxParam - len([]rune(r)) + maxInstr
+			it := maxParam - len([]rune(r))
 			for i := 0; i < it; i++ {
 				r = r + " "
 			}
 			r += fmt.Sprintf("// %s", x.comment)
 		}
 		if x.continued {
-			it := maxComm - len([]rune(r)) + maxInstr
+			it := maxComm - len([]rune(r))
 			for i := 0; i < it; i++ {
 				r = r + " "
 			}
