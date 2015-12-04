@@ -489,6 +489,9 @@ func (st statement) isTerminator() bool {
 
 // Detects commands based on case.
 func (st statement) isCommand() bool {
+	if st.isLabel() {
+		return false
+	}
 	up := strings.ToUpper(st.instruction)
 	return up == st.instruction
 }
@@ -527,7 +530,8 @@ func formatStatements(s []statement) []string {
 		il := len([]rune(x.instruction)) + 1 // Instruction length
 		l := il
 		// Ignore length if we are a define "function"
-		if l > maxInstr && !x.function {
+		// or we are a parameterless instruction.
+		if l > maxInstr && !x.function && !(x.isCommand() && len(x.params) == 0) {
 			maxInstr = l
 		}
 		if x.function && il > maxAlone {

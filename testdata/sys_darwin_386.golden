@@ -361,14 +361,14 @@ TEXT runtime·bsdthread_start(SB), NOSPLIT, $0
 	ADDL $7, DI        // m0 is LDT#7. count up.
 
 	// setldt(tls#, &tls, sizeof tls)
-	PUSHAL                    // save registers
-	PUSHL  $32                // sizeof tls
-	PUSHL  BP                 // &tls
-	PUSHL  DI                 // tls #
-	CALL   runtime·setldt(SB)
-	POPL   AX
-	POPL   AX
-	POPL   AX
+	PUSHAL                   // save registers
+	PUSHL $32                // sizeof tls
+	PUSHL BP                 // &tls
+	PUSHL DI                 // tls #
+	CALL  runtime·setldt(SB)
+	POPL  AX
+	POPL  AX
+	POPL  AX
 	POPAL
 
 	// Now segment is established.  Initialize m, g.
