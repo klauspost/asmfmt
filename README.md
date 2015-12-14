@@ -12,7 +12,7 @@ This will format your assembler code in a similar way that `gofmt` formats your 
 
 See [Example 1](https://files.klauspost.com/diff.html), [Example 2](https://files.klauspost.com/diff2.html), [Example 3](https://files.klauspost.com/diff3.html), or compare files in the [testdata folder](https://github.com/klauspost/asmfmt/tree/master/testdata).
 
-Status: Beta. The format will still change, and there may unknown cases where the formatting mangles the output. Please report any feedback in the issue section.
+Status: STABLE. The format will only change if bugs are found. Please report any feedback in the issue section.
 
 # install
 
