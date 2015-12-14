@@ -100,7 +100,7 @@ func (f *fstate) addLine(b []byte) error {
 		}
 	}
 
-	// Comment only line.
+	// Comment is the the only line content.
 	if strings.HasPrefix(s, "//") {
 		// Non-comment content is now added.
 		defer func() {
@@ -144,6 +144,7 @@ func (f *fstate) addLine(b []byte) error {
 		return nil
 	}
 
+	// Handle end-of blockcomments.
 	if strings.Contains(s, "/*") && !strings.HasSuffix(s, `\`) {
 		starts := strings.Index(s, "/*")
 		ends := strings.Index(s, "*/")
@@ -329,6 +330,7 @@ func (f *fstate) newLine() error {
 }
 
 // newStatement will parse a line and return it as a statement.
+// Will return nil if the line is empty after whitespace removal.
 func newStatement(s string, defs map[string]struct{}) *statement {
 	s = strings.TrimSpace(s)
 
@@ -404,6 +406,10 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 	return &st
 }
 
+// setParams will add the string given as parameters.
+// Inline comments are retained.
+// There will be a space after ",", unless inside a comment.
+// A tab is replaced by a space for consistent indentation.
 func (st *statement) setParams(s string) {
 	st.params = make([]string, 0)
 	runes := []rune(s)
@@ -460,10 +466,12 @@ func (st statement) level0() bool {
 	return st.isLabel() || st.isTEXT() || st.isPreProcessor()
 }
 
+// Will return true if the statement is a label.
 func (st statement) isLabel() bool {
 	return strings.HasSuffix(st.instruction, ":")
 }
 
+// isPreProcessor will return if the statement is a preprocessor statement.
 func (st statement) isPreProcessor() bool {
 	return strings.HasPrefix(st.instruction, "#")
 }
@@ -475,6 +483,7 @@ func (st statement) isGlobal() bool {
 	return up == "DATA" || up == "GLOBL"
 }
 
+// isTEXT returns true if the instruction is "TEXT", "DATA" or "GLOBL".
 func (st statement) isTEXT() bool {
 	up := strings.ToUpper(st.instruction)
 	return up == "TEXT" || up == "DATA" || up == "GLOBL"
@@ -520,12 +529,13 @@ func (st statement) define() string {
 
 // formatStatements will format a slice of statements and return each line
 // as a separate string.
+// Comments and line-continuation (\) are aligned with spaces.
 func formatStatements(s []statement) []string {
 	res := make([]string, len(s))
-	maxParam := 0
-	maxInstr := 0
-	maxAlone := 0
-	maxComm := 0
+	maxParam := 0 // Lenght of longest parameter
+	maxInstr := 0 // Length of longest instruction WITH parameters.
+	maxAlone := 0 // Length of longest instruction without parameters.
+	maxComm := 0  // Lenght of longest end-of-line comment.
 	for _, x := range s {
 		il := len([]rune(x.instruction)) + 1 // Instruction length
 		l := il
