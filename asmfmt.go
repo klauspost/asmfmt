@@ -333,13 +333,7 @@ func (f *fstate) newLine() error {
 // Will return nil if the line is empty after whitespace removal.
 func newStatement(s string, defs map[string]struct{}) *statement {
 	s = strings.TrimSpace(s)
-
 	st := statement{}
-	fields := strings.Fields(s)
-	if len(fields) < 1 {
-		return nil
-	}
-	st.instruction = fields[0]
 
 	// Fix where a comment start if any
 	startcom := strings.Index(s, "//")
@@ -347,6 +341,13 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 		st.comment = strings.TrimSpace(s[startcom+2:])
 		s = strings.TrimSpace(s[:startcom])
 	}
+
+	// Split into fields
+	fields := strings.Fields(s)
+	if len(fields) < 1 {
+		return nil
+	}
+	st.instruction = fields[0]
 
 	// Handle defined macro calls
 	if len(defs) > 0 {
@@ -401,6 +402,10 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 		i := strings.TrimSuffix(st.instruction, `\`)
 		st.instruction = strings.TrimSpace(i)
 		st.continued = true
+	}
+
+	if len(st.params) == 0 && !st.isLabel() {
+		st.function = true
 	}
 
 	return &st
@@ -571,6 +576,9 @@ func formatStatements(s []statement) []string {
 	maxParam += maxInstr
 	if maxAlone > maxComm {
 		maxComm = maxAlone
+	}
+	if maxInstr == 0 {
+		maxInstr = maxAlone
 	}
 
 	for i, x := range s {

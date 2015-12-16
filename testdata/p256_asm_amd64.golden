@@ -2472,9 +2472,9 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 	LDacc (y)
 	p256MulBy2Inline
 	t2acc
-	CALL  p256SqrInternal(SB)
+	CALL p256SqrInternal(SB)
 	ST (s)
-	CALL  p256SqrInternal(SB)
+	CALL p256SqrInternal(SB)
 
 	// Divide by 2
 	XORQ mul0, mul0
@@ -2525,7 +2525,7 @@ TEXT ·p256PointDoubleAsm(SB), NOSPLIT, $256-48
 
 	acc2t
 	LDacc (s)
-	CALL  p256SubInternal(SB)
+	CALL p256SubInternal(SB)
 
 	LDt (m)
 	CALL p256MulInternal(SB)

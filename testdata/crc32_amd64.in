@@ -16,7 +16,6 @@ TEXT ·castagnoliSSE42(SB),NOSPLIT,$0
 	/* If there's less than 8 bytes to process, we do it byte-by-byte. */
 	CMPQ CX, $8
 	JL cleanup
-
 	/* Process individual bytes until the input is 8-byte aligned. */
 startup:
 	MOVQ SI, BX
