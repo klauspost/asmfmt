@@ -1,0 +1,11 @@
+// func crc32sse(a []byte) hash
+TEXT ·crc32sse(SB), 7, $0
+	// Indendation increased to 1
+	MOVQ a+0(FP), R10
+
+	// Still level 1 because last instruction was not a terminator.
+	BYTE $0xF2; BYTE $0x41; BYTE $0x0f
+
+	RET// RET is a terminator
+
+	// This comment is at level 0, because it is following a terminator
