@@ -1,0 +1,6 @@
+#define MACRO \
+	MOVQ AB BX            \
+	\ // Some comment   \
+	\ // Another comment
+	MOVQ AB BX            \
+	MOVQ BX AX
