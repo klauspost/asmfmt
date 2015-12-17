@@ -50,6 +50,7 @@ type fstate struct {
 	anyContents   bool
 	lastContinued bool // Last line continued
 	queued        []statement
+	comments      []string
 	defines       map[string]struct{}
 }
 
@@ -121,25 +122,19 @@ func (f *fstate) addLine(b []byte) error {
 			return err
 		}
 
-		err = f.indent()
-		if err != nil {
-			return err
-		}
-
 		// Preserve whitespace if the first character after the comment
 		// is a whitespace
 		ts := strings.TrimSpace(s)
+		var q string
 		if (ts != s && len(ts) > 0) || (len(s) > 0 && strings.ContainsAny(string(s[0]), `+/`)) {
-			_, err = fmt.Fprintln(f.out, "//"+s)
+			q = fmt.Sprint("//" + s)
 		} else if len(ts) > 0 {
 			// Insert a space before the comment
-			_, err = fmt.Fprintln(f.out, "//", s)
+			q = fmt.Sprint("// " + s)
 		} else {
-			_, err = fmt.Fprintln(f.out, "//")
+			q = fmt.Sprint("//")
 		}
-		if err != nil {
-			return err
-		}
+		f.comments = append(f.comments, q)
 		f.lastComment = true
 		return nil
 	}
@@ -150,6 +145,7 @@ func (f *fstate) addLine(b []byte) error {
 		ends := strings.Index(s, "*/")
 		pre := s[:starts]
 		pre = strings.TrimSpace(pre)
+
 		if len(pre) > 0 {
 			if strings.HasSuffix(s, `\`) {
 				goto exitcomm
@@ -303,8 +299,19 @@ func (f *fstate) indent() error {
 	return nil
 }
 
-// flush any queued commands
+// flush any queued comments and commands
 func (f *fstate) flush() error {
+	for _, line := range f.comments {
+		err := f.indent()
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintln(f.out, line)
+		if err != nil {
+			return err
+		}
+	}
+	f.comments = nil
 	s := formatStatements(f.queued)
 	for _, line := range s {
 		err := f.indent()

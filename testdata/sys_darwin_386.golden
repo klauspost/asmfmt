@@ -254,7 +254,7 @@ TEXT runtime·sigtramp(SB), NOSPLIT, $40
 	CALL AX
 	JMP  sigtramp_ret
 
-// save g
+	// save g
 	MOVL DI, 20(SP)
 
 	// g = m->gsignal
