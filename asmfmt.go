@@ -60,6 +60,7 @@ type statement struct {
 	comment     string   // Without slashes
 	function    bool     // Probably define call
 	continued   bool     // Multiline statement, continues on next line
+	contComment bool     // Multiline statement, comment only
 }
 
 // Add a new input line.
@@ -378,6 +379,14 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 		st.instruction = s
 	}
 
+	if st.instruction == "\\" && len(st.comment) > 0 {
+		st.instruction = fmt.Sprintf("\\ // %s", st.comment)
+		st.comment = ""
+		st.function = true
+		st.continued = true
+		st.contComment = true
+	}
+
 	s = strings.TrimPrefix(s, st.instruction)
 	st.instruction = strings.Replace(st.instruction, "\t", " ", -1)
 	s = strings.TrimSpace(s)
@@ -405,7 +414,7 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 			st.continued = true
 		}
 	}
-	if strings.HasSuffix(st.instruction, `\`) {
+	if strings.HasSuffix(st.instruction, `\`) && !st.contComment {
 		i := strings.TrimSuffix(st.instruction, `\`)
 		st.instruction = strings.TrimSpace(i)
 		st.continued = true
@@ -589,8 +598,12 @@ func formatStatements(s []statement) []string {
 	}
 
 	for i, x := range s {
-		p := strings.Join(x.params, ", ")
 		r := x.instruction
+		if x.contComment {
+			res[i] = x.instruction
+			continue
+		}
+		p := strings.Join(x.params, ", ")
 		if len(x.params) > 0 || len(x.comment) > 0 {
 			for len(r) < maxInstr {
 				r += " "
@@ -604,7 +617,7 @@ func formatStatements(s []statement) []string {
 			}
 			r += fmt.Sprintf("// %s", x.comment)
 		}
-		if x.continued {
+		if x.continued && len(x.comment) == 0 {
 			it := maxComm - len([]rune(r))
 			for i := 0; i < it; i++ {
 				r = r + " "
