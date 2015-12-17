@@ -1,0 +1,6 @@
+	BYTE $0x48; BYTE $0x8d; BYTE $0x3d; BYTE $0xc9; BYTE $0x6a; BYTE $0xa3; BYTE $0x00
+	BYTE                                                                               // don't touch;semicolon in my comments
+
+#define macro \
+	NOP /* don't touch; semicolon in my comments*/ \
+	RET

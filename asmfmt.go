@@ -539,6 +539,22 @@ func (st statement) define() string {
 	return ""
 }
 
+func splitSemic(s string) string {
+	split := strings.Split(s, ";")
+	for i := range split {
+		split[i] = strings.TrimSpace(split[i])
+	}
+	return strings.TrimSpace(strings.Join(split, "; "))
+}
+
+func (st *statement) cleanParams() {
+	// Remove whitespace before semicolons
+	for i := range st.params {
+		st.params[i] = splitSemic(st.params[i])
+	}
+	st.instruction = splitSemic(st.instruction)
+}
+
 // formatStatements will format a slice of statements and return each line
 // as a separate string.
 // Comments and line-continuation (\) are aligned with spaces.
@@ -549,6 +565,7 @@ func formatStatements(s []statement) []string {
 	maxAlone := 0 // Length of longest instruction without parameters.
 	maxComm := 0  // Lenght of longest end-of-line comment.
 	for _, x := range s {
+		x.cleanParams()
 		il := len([]rune(x.instruction)) + 1 // Instruction length
 		l := il
 		// Ignore length if we are a define "function"
