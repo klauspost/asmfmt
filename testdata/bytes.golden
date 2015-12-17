@@ -2,5 +2,5 @@
 	BYTE                                                                               // don't touch;semicolon in my comments
 
 #define macro \
-	NOP /* don't touch; semicolon in my comments*/ \
+	NOP /* don't touch;semicolon in my comments*/ \
 	RET
