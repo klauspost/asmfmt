@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode"
 )
 
 // Format the input and return the formatted data.
@@ -434,51 +435,49 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 func (st *statement) setParams(s string) {
 	st.params = make([]string, 0)
 	runes := []rune(s)
-	start := 0
-	lastSlash := false
+	last := '\n'
 	inComment := false
-	lastAst := false
-	for i, r := range runes {
+	out := make([]rune, 0, len(runes))
+	for _, r := range runes {
 		switch r {
 		case ',':
 			if inComment {
-				lastSlash = false
-				lastAst = false
-				continue
+				break
 			}
-			c := strings.TrimSpace(string(runes[start:i]))
+			c := strings.TrimSpace(string(out))
 			if len(c) > 0 {
 				st.params = append(st.params, c)
 			}
-			start = i + 1
+			out = out[0:0]
+			continue
 		case '/':
-			if lastAst && inComment {
+			if last == '*' && inComment {
 				inComment = false
-				lastSlash = false
-			} else {
-				lastSlash = false
-				lastSlash = true
 			}
 		case '*':
-			if lastSlash {
+			if last == '/' {
 				inComment = true
-			} else {
-				lastAst = true
 			}
 		case '\t':
 			if !st.isPreProcessor() {
-				runes[i] = ' '
+				r = ' '
 			}
-		default:
-			lastSlash = false
-			lastAst = false
+		case ';':
+			if !inComment {
+				out = []rune(strings.TrimSpace(string(out)) + "; ")
+				last = r
+				continue
+			}
 		}
+		if last == ';' && unicode.IsSpace(r) {
+			continue
+		}
+		last = r
+		out = append(out, r)
 	}
-	if start < len(runes) {
-		c := strings.TrimSpace(string(runes[start:]))
-		if len(c) > 0 {
-			st.params = append(st.params, c)
-		}
+	c := strings.TrimSpace(string(out))
+	if len(c) > 0 {
+		st.params = append(st.params, c)
 	}
 }
 
@@ -548,6 +547,14 @@ func (st statement) define() string {
 	return ""
 }
 
+func (st *statement) cleanParams() {
+	// Remove whitespace before semicolons
+	if strings.HasSuffix(st.instruction, ";") {
+		s := strings.TrimSuffix(st.instruction, ";")
+		st.instruction = strings.TrimSpace(s) + ";"
+	}
+}
+
 // formatStatements will format a slice of statements and return each line
 // as a separate string.
 // Comments and line-continuation (\) are aligned with spaces.
@@ -558,6 +565,7 @@ func formatStatements(s []statement) []string {
 	maxAlone := 0 // Length of longest instruction without parameters.
 	maxComm := 0  // Lenght of longest end-of-line comment.
 	for _, x := range s {
+		x.cleanParams()
 		il := len([]rune(x.instruction)) + 1 // Instruction length
 		l := il
 		// Ignore length if we are a define "function"

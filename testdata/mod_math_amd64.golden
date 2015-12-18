@@ -50,20 +50,20 @@ TEXT ·mod_add(SB), 7, $0-24
 // This is much faster (2 or 3 times) than DIVQ
 #define MOD_REDUCE(b, a, t0, t1, p, label) \
 	MOVL        b, t0; /* Also sets upper 32 bits to 0 */ \
-	SHRQ        $32, b ;                                  \
+	SHRQ        $32, b;                                   \
 	;                                                     \
-	CMPQ        a, p ;                                    \
-	JCS         label/**/1 ;                              \
-	SUBQ        p, a ;                                    \
+	CMPQ        a, p;                                     \
+	JCS         label/**/1;                               \
+	SUBQ        p, a;                                     \
 	label/**/1: ;                                         \
 	;                                                     \
-	MOVLQZX     t0, t1 ;                                  \
+	MOVLQZX     t0, t1;                                   \
 	MOD_SUB(a, t1, p, label/**/2) ;                       \
 	;                                                     \
-	MOVLQZX     b, t1 ;                                   \
+	MOVLQZX     b, t1;                                    \
 	MOD_SUB(a, t1, p, label/**/3) ;                       \
 	;                                                     \
-	SHLQ        $32, t0 ;                                 \
+	SHLQ        $32, t0;                                  \
 	MOD_ADD(a, t0, t1, p, label/**/4) ;                   \
 
 TEXT ·mod_reduce(SB), 7, $0-24
@@ -98,7 +98,7 @@ TEXT ·mod_sqr(SB), 7, $0-16
 	/* xmid_xlow := x << shift, (xmid, xlow) */                                              \
 	SHLQ $shift, x;                                                                          \
 	/* xhigh := uint32(x >> (64 - shift)) */                                                 \
-	SHRQ $(64-shift), t0 ;                                                                   \
+	SHRQ $(64-shift), t0;                                                                    \
 	/* t := uint64(0xFFFFFFFF-xhigh)<<32 + uint64(xhigh+1), (2^32 - 1 - xhigh, xhigh + 1) */ \
 	MOVL t0, t1;                                                                             \
 	SHLQ $32, t0;                                                                            \
