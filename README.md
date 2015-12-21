@@ -45,6 +45,7 @@ Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler fil
 * Dec 21, 2015: Space before semi-colons in macro definitions is now trimmed.
 * Dec 21, 2015: Fix line comments in macro definitions (only valid with Go 1.5).
 * Dec 17, 2015: Comments are better aligned to the following section.
+* Dec 17, 2015: Clean semi-colons in multiple instruction per line.
 
 # emacs
 
@@ -100,4 +101,5 @@ You should only run `asmfmt` on files that are assembler files. Assembler files 
 * Macros in the same file are tracked, and not included in parameter indentation.
 * `TEXT`, `DATA` and `GLOBL` and labels are level 0 indentation.
 * Aligns `\` in multiline macros.
+* Whitespace before separating `;` is removed. Space is inserted after, if followed by another instruction.
 
