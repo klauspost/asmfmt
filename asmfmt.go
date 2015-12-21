@@ -563,7 +563,6 @@ func formatStatements(s []statement) []string {
 	maxParam := 0 // Lenght of longest parameter
 	maxInstr := 0 // Length of longest instruction WITH parameters.
 	maxAlone := 0 // Length of longest instruction without parameters.
-	maxComm := 0  // Lenght of longest end-of-line comment.
 	for i, x := range s {
 		// Clean up and store
 		x.cleanParams()
@@ -592,18 +591,9 @@ func formatStatements(s []statement) []string {
 		if l > maxParam {
 			maxParam = l
 		}
-		// Add comment (for line continuations)
-		l += len([]rune(x.comment))
-		if l > maxComm {
-			maxComm = l
-		}
 	}
 
-	maxComm += maxInstr
 	maxParam += maxInstr
-	if maxAlone > maxComm {
-		maxComm = maxAlone
-	}
 	if maxInstr == 0 {
 		maxInstr = maxAlone
 	}
@@ -621,19 +611,28 @@ func formatStatements(s []statement) []string {
 			}
 		}
 		r = r + p
-		if len(x.comment) > 0 {
+		if len(x.comment) > 0 && !x.continued {
 			it := maxParam - len([]rune(r))
 			for i := 0; i < it; i++ {
 				r = r + " "
 			}
 			r += fmt.Sprintf("// %s", x.comment)
 		}
-		if x.continued && len(x.comment) == 0 {
-			it := maxComm - len([]rune(r))
+
+		if x.continued {
+			// Find continuation placement.
+			it := maxParam - len([]rune(r))
+			if maxAlone > maxParam {
+				it = maxAlone - len([]rune(r))
+			}
 			for i := 0; i < it; i++ {
 				r = r + " "
 			}
 			r += `\`
+			// Add comment, if any.
+			if len(x.comment) > 0 {
+				r += " // " + x.comment
+			}
 		}
 		res[i] = r
 	}

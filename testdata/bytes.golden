@@ -9,3 +9,8 @@
 	MACRO; \
 	MACRO; \
 	NOP
+
+#define macromacromacro \
+	MACRO; \ // A comment
+	MACRO; \ // Another comment  with backslash:\
+	NOP
