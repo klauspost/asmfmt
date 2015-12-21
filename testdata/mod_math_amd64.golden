@@ -58,13 +58,13 @@ TEXT ·mod_add(SB), 7, $0-24
 	label/**/1: ;                                         \
 	;                                                     \
 	MOVLQZX     t0, t1;                                   \
-	MOD_SUB(a, t1, p, label/**/2) ;                       \
+	MOD_SUB(a, t1, p, label/**/2);                        \
 	;                                                     \
 	MOVLQZX     b, t1;                                    \
-	MOD_SUB(a, t1, p, label/**/3) ;                       \
+	MOD_SUB(a, t1, p, label/**/3);                        \
 	;                                                     \
 	SHLQ        $32, t0;                                  \
-	MOD_ADD(a, t0, t1, p, label/**/4) ;                   \
+	MOD_ADD(a, t0, t1, p, label/**/4);                    \
 
 TEXT ·mod_reduce(SB), 7, $0-24
 	MOVQ $MOD_P, R8

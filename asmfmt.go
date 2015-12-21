@@ -564,8 +564,11 @@ func formatStatements(s []statement) []string {
 	maxInstr := 0 // Length of longest instruction WITH parameters.
 	maxAlone := 0 // Length of longest instruction without parameters.
 	maxComm := 0  // Lenght of longest end-of-line comment.
-	for _, x := range s {
+	for i, x := range s {
+		// Clean up and store
 		x.cleanParams()
+		s[i] = x
+
 		il := len([]rune(x.instruction)) + 1 // Instruction length
 		l := il
 		// Ignore length if we are a define "function"
