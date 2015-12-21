@@ -9,3 +9,8 @@ BYTE /* don't touch;semicolon in my comments*/
 MACRO   ;  \
 	MACRO   ;\
 NOP
+
+#define macromacromacro \
+MACRO   ;  \ // A comment
+	MACRO   ;\  // Another comment  with backslash:\
+NOP
