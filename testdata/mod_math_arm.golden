@@ -228,7 +228,7 @@ TEXT ·mod_reduce(SB), 7, $0-24
 	ADD.S y0, z1, z1;                                                    \
 	ADC.S t0, z2, z2;                                                    \
 	ADC   $0, z3, z3;                                                    \
-	MOD_REDUCE(z0, z1, z2, z3, neg1, label) ;                            \
+	MOD_REDUCE(z0, z1, z2, z3, neg1, label);                             \
 
 // 4 words at 4..20(R13) for called routine parameters
 TEXT ·mod_mul(SB), 7, $0-24
@@ -315,7 +315,7 @@ TEXT ·mod_sqr(SB), 7, $0-24
 	MOVW    $-1, R12;                                   \
 	MOVW    $0, R11;                                    \
 	MOVM.IB (R13), [R0, R1];                            \
-	MOD_SHIFT_0_TO_31(shift, R4, R5, R0, R1, R12, R11) ;\
+	MOD_SHIFT_0_TO_31(shift, R4, R5, R0, R1, R12, R11); \
 	MOVW    R4, ret+8(FP);                              \
 	MOVW    R5, ret+12(FP);                             \
 	RET     ;                                           \
@@ -376,17 +376,17 @@ TEXT ·mod_shift30(SB), 7, $0-16
 	// ------------------------------------------------------------
 
 #define MOD_SHIFT_32_TO_63(shift, t0, t1, x0, x1, neg1) \
-	/* xhigh = x1, LSR #64 - shift */  ;                                           \
-	/* xmid = (x1, LSL #shift - 32) OR (x0, LSR #64 - shift) */ ;                  \
-	/* xlow  = x0, LSL #shift - 32 */  ;                                           \
+	/* xhigh = x1, LSR #64 - shift */;                                             \
+	/* xmid = (x1, LSL #shift - 32) OR (x0, LSR #64 - shift) */;                   \
+	/* xlow  = x0, LSL #shift - 32 */;                                             \
 	MOVW     x1<<(shift-32), t1   /* t1 = xmid */;                                 \
 	ORR      x0>>(64-shift), t1, t1;                                               \
-	/* calculate (t1,t0) = (-xmid, xhigh + xmid) */ ;                              \
+	/* calculate (t1,t0) = (-xmid, xhigh + xmid) */;                               \
 	RSB.S    $0, t1, t1    /* xmidneg = 0 - xmid */;                               \
 	SBC      $0, t1, t0    /* xmidcomp = xmidneg - (borrow from last subtract) */; \
 	RSB.S    x1>>(64-shift), t0, t0   /* xhigh - xmidcomp */;                      \
 	SBC      $0, t1, t1    /* xmidneg - carry */;                                  \
-	/* calculate (t1,t0) = (xlow, 0) - (t1,t0) mod p */ ;                          \
+	/* calculate (t1,t0) = (xlow, 0) - (t1,t0) mod p */;                           \
 	RSB.S    $0, t0, t0    /* 0 - t0 */;                                           \
 	RSC.S    x0<<(shift-32), t1, t1   /* xlow - t1 - carry */;                     \
 	SUB.CC.S neg1, t0, t0;                                                         \
@@ -395,7 +395,7 @@ TEXT ·mod_shift30(SB), 7, $0-16
 #define MOD_SHIFT_32_TO_63_PROC(shift) \
 	MOVW    $-1, R12;                               \
 	MOVM.IB (R13), [R0, R1];                        \
-	MOD_SHIFT_32_TO_63(shift, R4, R5, R0, R1, R12) ;\
+	MOD_SHIFT_32_TO_63(shift, R4, R5, R0, R1, R12); \
 	MOVW    R4, ret+8(FP);                          \
 	MOVW    R5, ret+12(FP);                         \
 	RET     ;                                       \
@@ -446,13 +446,13 @@ TEXT ·mod_shift63(SB), 7, $0-16
 	// ------------------------------------------------------------
 
 #define MOD_SHIFT_64_TO_95(shift, t0, t1, x0, x1, neg1, rzero) \
-	/* xhigh = x1, LSR #96 - shift */ ;                                           \
-	/* xmid = (x1, LSL #shift - 64) OR (x0, LSR #96 - shift) */ ;                 \
-	/* xlow  = x0, LSL #shift - 64 */ ;                                           \
-	/* calculate (xlow, 0) - (0, xlow) */ ;                                       \
+	/* xhigh = x1, LSR #96 - shift */;                                            \
+	/* xmid = (x1, LSL #shift - 64) OR (x0, LSR #96 - shift) */;                  \
+	/* xlow  = x0, LSL #shift - 64 */;                                            \
+	/* calculate (xlow, 0) - (0, xlow) */;                                        \
 	SUB.S    x0<<(shift-64), rzero, t0  /* 0 - xlow */;                           \
 	RSC      x0<<(shift-64), rzero, t1 /* xlow - 0 - carry, no carry possible */; \
-	/* calculate (xlow, -xlow) - (xhigh, xmid) */ ;                               \
+	/* calculate (xlow, -xlow) - (xhigh, xmid) */;                                \
 	MOVW     x0>>(96-shift), x0  /* x0 = xmid */;                                 \
 	ORR      x1<<(shift-64), x0, x0;                                              \
 	SUB.S    x0, t0, t0   /* t0 - xmid */;                                        \
@@ -464,7 +464,7 @@ TEXT ·mod_shift63(SB), 7, $0-16
 	MOVW    $-1, R12;                                    \
 	MOVW    $0, R11;                                     \
 	MOVM.IB (R13), [R0, R1];                             \
-	MOD_SHIFT_64_TO_95(shift, R4, R5, R0, R1, R12, R11) ;\
+	MOD_SHIFT_64_TO_95(shift, R4, R5, R0, R1, R12, R11); \
 	MOVW    R4, ret+8(FP);                               \
 	MOVW    R5, ret+12(FP);                              \
 	RET     ;                                            \
