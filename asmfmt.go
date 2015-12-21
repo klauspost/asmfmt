@@ -23,10 +23,7 @@ func Format(in io.Reader) ([]byte, error) {
 	for {
 		data, _, err := src.ReadLine()
 		if err == io.EOF {
-			err := state.flush()
-			if err != nil {
-				return nil, err
-			}
+			state.flush()
 			break
 		}
 		if err != nil {
@@ -90,16 +87,13 @@ func (f *fstate) addLine(b []byte) error {
 		} else {
 			// Insert a space on lines that begin with '*'
 			if strings.HasPrefix(s, "*") {
-				err := f.out.WriteByte(' ')
-				if err != nil {
-					return err
-				}
+				f.out.WriteByte(' ')
 				f.lastStar = true
 			} else {
 				f.lastStar = false
 			}
-			_, err := fmt.Fprintln(f.out, s)
-			return err
+			fmt.Fprintln(f.out, s)
+			return nil
 		}
 	}
 
@@ -114,15 +108,8 @@ func (f *fstate) addLine(b []byte) error {
 
 		s = strings.TrimPrefix(s, "//")
 
-		err := f.flush()
-		if err != nil {
-			return err
-		}
-
-		err = f.newLine()
-		if err != nil {
-			return err
-		}
+		f.flush()
+		f.newLine()
 
 		// Preserve whitespace if the first character after the comment
 		// is a whitespace
@@ -163,10 +150,7 @@ func (f *fstate) addLine(b []byte) error {
 			}
 		}
 
-		err := f.flush()
-		if err != nil {
-			return err
-		}
+		f.flush()
 
 		// Convert single line /* comment */ to // Comment
 		if ends > starts && ends >= len(s)-2 {
@@ -196,10 +180,8 @@ func (f *fstate) addLine(b []byte) error {
 exitcomm:
 
 	if len(s) == 0 {
-		err := f.flush()
-		if err != nil {
-			return err
-		}
+		f.flush()
+
 		// No more than two empty lines in a row
 		// cannot start with NL
 		if f.lastEmpty || !f.anyContents {
@@ -246,23 +228,15 @@ exitcomm:
 
 	// Should this line be at level 0?
 	if st.level0() && !(st.continued && f.lastContinued) {
-		err := f.flush()
-		if err != nil {
-			return err
-		}
+		f.flush()
 
 		// Add newline before jump target.
-		err = f.newLine()
-		if err != nil {
-			return err
-		}
+		f.newLine()
 
 		f.indentation = 0
 		f.queued = append(f.queued, *st)
-		err = f.flush()
-		if err != nil {
-			return err
-		}
+		f.flush()
+
 		if !st.isPreProcessor() && !st.isGlobal() {
 			f.indentation = 1
 		}
@@ -277,10 +251,7 @@ exitcomm:
 	if st.isTerminator() || (f.lastContinued && !st.continued) {
 		// Terminators should always be at level 1
 		f.indentation = 1
-		err := f.flush()
-		if err != nil {
-			return err
-		}
+		f.flush()
 		f.indentation = 0
 	} else if st.isCommand() {
 		// handles cases where a JMP/RET isn't a terminator
@@ -291,51 +262,33 @@ exitcomm:
 }
 
 // indent the current line with current indentation.
-func (f *fstate) indent() error {
+func (f *fstate) indent() {
 	for i := 0; i < f.indentation; i++ {
-		err := f.out.WriteByte('\t')
-		if err != nil {
-			return err
-		}
+		f.out.WriteByte('\t')
 	}
-	return nil
 }
 
 // flush any queued comments and commands
-func (f *fstate) flush() error {
+func (f *fstate) flush() {
 	for _, line := range f.comments {
-		err := f.indent()
-		if err != nil {
-			return err
-		}
-		_, err = fmt.Fprintln(f.out, line)
-		if err != nil {
-			return err
-		}
+		f.indent()
+		fmt.Fprintln(f.out, line)
 	}
 	f.comments = nil
 	s := formatStatements(f.queued)
 	for _, line := range s {
-		err := f.indent()
-		if err != nil {
-			return err
-		}
-		_, err = fmt.Fprintln(f.out, line)
-		if err != nil {
-			return err
-		}
+		f.indent()
+		fmt.Fprintln(f.out, line)
 	}
 	f.queued = nil
-	return nil
 }
 
 // Add a newline, unless last line was empty or a comment
-func (f *fstate) newLine() error {
+func (f *fstate) newLine() {
 	// Always newline before comment-only line.
 	if !f.lastEmpty && !f.lastComment && !f.lastLabel && f.anyContents {
-		return f.out.WriteByte('\n')
+		f.out.WriteByte('\n')
 	}
-	return nil
 }
 
 // newStatement will parse a line and return it as a statement.
