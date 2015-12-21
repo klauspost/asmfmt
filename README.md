@@ -40,6 +40,12 @@ usage: goimports [flags] [path ...]
 
 Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler files as well.
 
+# updates
+
+* Dec 21, 2015: Space before semi-colons in macro definitions is now trimmed.
+* Dec 21, 2015: Fix line comments in macro definitions (only valid with Go 1.5).
+* Dec 17, 2015: Comments are better aligned to the following section.
+
 # emacs
 
 To automatically format assembler, in `.emacs` add:
