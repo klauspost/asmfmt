@@ -54,7 +54,7 @@ To automatically format assembler, in `.emacs` add:
 ```
 (defun asm-mode-setup ()
   (setq gofmt-command "asmfmt")
-  (add-hook 'before-save-hook 'gofmt)
+  (add-hook 'before-save-hook 'gofmt nil t)
 )
 
 (add-hook 'asm-mode-hook 'asm-mode-setup)
