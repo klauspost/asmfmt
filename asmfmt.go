@@ -63,6 +63,9 @@ type statement struct {
 
 // Add a new input line.
 func (f *fstate) addLine(b []byte) error {
+	if bytes.Contains(b, []byte{0}) {
+		return fmt.Errorf("zero (0) byte in input. file is unlikely an assembler file")
+	}
 	s := string(b)
 	s = strings.TrimSpace(s)
 	// Inside block comment
