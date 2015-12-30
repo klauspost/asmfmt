@@ -200,9 +200,6 @@ exitcomm:
 		f.anyContents = true
 		f.lastEmpty = false
 		f.lastStar = false
-	}()
-
-	defer func() {
 		f.lastComment = false
 	}()
 
