@@ -131,3 +131,13 @@ func TestGoFile(t *testing.T) {
 		return
 	}
 }
+
+// Files containg zero byte values must fail.
+func TestZeroByteFile(t *testing.T) {
+	var input = []byte{13, 13, 10, 0, 0, 0, 13}
+	_, err := Format(bytes.NewBuffer(input))
+	if err == nil {
+		t.Fatal("file containing zero (0) byte values not rejected")
+		return
+	}
+}
