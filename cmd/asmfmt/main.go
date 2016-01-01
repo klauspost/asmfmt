@@ -40,7 +40,7 @@ var (
 )
 
 func report(err error) {
-	fmt.Fprint(os.Stderr, err)
+	fmt.Fprintln(os.Stderr, err)
 	errors++
 	if !*allErrors && errors >= 10 {
 		os.Exit(2)
