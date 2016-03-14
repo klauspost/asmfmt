@@ -450,16 +450,22 @@ func (st statement) isPreProcessor() bool {
 }
 
 // isGlobal returns true if the current instruction is
-// a global. Currently that is DATA and GLOBL
+// a global. Currently that is DATA, GLOBL, FUNCDATA and PCDATA
 func (st statement) isGlobal() bool {
 	up := strings.ToUpper(st.instruction)
-	return up == "DATA" || up == "GLOBL"
+	switch up {
+	case "DATA", "GLOBL", "FUNCDATA", "PCDATA":
+		return true
+	default:
+		return false
+	}
 }
 
-// isTEXT returns true if the instruction is "TEXT", "DATA" or "GLOBL".
+// isTEXT returns true if the instruction is "TEXT"
+// or one of the "isGlobal" types
 func (st statement) isTEXT() bool {
 	up := strings.ToUpper(st.instruction)
-	return up == "TEXT" || up == "DATA" || up == "GLOBL"
+	return up == "TEXT" || st.isGlobal()
 }
 
 // We attempt to identify "terminators", after which
