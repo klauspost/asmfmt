@@ -89,7 +89,7 @@ func (f *fstate) addLine(b []byte) error {
 					s = ""
 				}
 			}
-			f.out.WriteString(end+"\n")
+			f.out.WriteString(end + "\n")
 			if len(s) == 0 {
 				return nil
 			}
