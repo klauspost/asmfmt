@@ -18,10 +18,9 @@ import (
 	"runtime"
 	"strings"
 
-	"golang.org/x/tools/imports"
-
-	"sourcegraph.com/sqs/goreturns/returns"
 	"github.com/klauspost/asmfmt"
+	"golang.org/x/tools/imports"
+	"sourcegraph.com/sqs/goreturns/returns"
 )
 
 var (
