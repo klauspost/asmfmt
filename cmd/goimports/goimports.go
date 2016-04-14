@@ -27,6 +27,7 @@ var (
 	list   = flag.Bool("l", false, "list files whose formatting differs from goimport's")
 	write  = flag.Bool("w", false, "write result to (source) file instead of stdout")
 	doDiff = flag.Bool("d", false, "display diffs instead of rewriting files")
+	srcdir = flag.String("srcdir", "", "choose imports as if source code is from `dir`")
 
 	options = &imports.Options{
 		TabWidth:  8,
@@ -87,7 +88,14 @@ func processGoFile(filename string, in io.Reader, out io.Writer, stdin bool) err
 		return err
 	}
 
-	res, err := imports.Process(filename, src, opt)
+	target := filename
+	if *srcdir != "" {
+		// Pretend that file is from *srcdir in order to decide
+		// visible imports correctly.
+		target = filepath.Join(*srcdir, filepath.Base(filename))
+	}
+
+	res, err := imports.Process(target, src, opt)
 	if err != nil {
 		return err
 	}
@@ -195,9 +203,16 @@ func main() {
 	os.Exit(exitCode)
 }
 
+// parseFlags parses command line flags and returns the paths to process.
+// It's a var so that custom implementations can replace it in other files.
+var parseFlags = func() []string {
+	flag.Parse()
+	return flag.Args()
+}
+
 func gofmtMain() {
 	flag.Usage = usage
-	flag.Parse()
+	paths := parseFlags()
 
 	if options.TabWidth < 0 {
 		fmt.Fprintf(os.Stderr, "negative tabwidth %d\n", options.TabWidth)
@@ -205,22 +220,21 @@ func gofmtMain() {
 		return
 	}
 
-	if flag.NArg() == 0 {
+	if len(paths) == 0 {
 		if err := processGoFile("<standard input>", os.Stdin, os.Stdout, true); err != nil {
 			report(err)
 		}
 		return
 	}
 
-	for i := 0; i < flag.NArg(); i++ {
-		path := flag.Arg(i)
+	for _, path := range paths {
 		switch dir, err := os.Stat(path); {
 		case err != nil:
 			report(err)
 		case dir.IsDir():
 			walkDir(path)
 		default:
-			if err := visitFile(path, dir, nil); err != nil {
+			if err := processGoFile(path, nil, os.Stdout, false); err != nil {
 				report(err)
 			}
 		}
