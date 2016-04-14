@@ -1,0 +1,22 @@
+// +build amd64,!gccgo,!appengine
+
+#define FOOBAR(ptr) \
+/*
+ * Here is a
+ * multi-line commant.
+ */ \
+        LEAL 15(ptr), AX; \
+        RET;
+
+        
+
+
+        #define FOOBAR(ptr) \
+/*
+ * Here is a
+ * multi-line commant.
+ */ PSHUFB $5, X1, X0; \
+        LEAL 15(ptr), AX; \
+        RET;
+
+
