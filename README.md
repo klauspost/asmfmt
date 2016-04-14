@@ -30,6 +30,8 @@ go get -u github.com/klauspost/asmfmt/cmd/goimports/...
 go get -u github.com/klauspost/asmfmt/cmd/goreturns/...
 ```
 
+Note that these require Go 1.5 due to changes in import paths.
+
 To test if the modified version is used, use `goimports -help`, and the output should look like this:
 
 ```
