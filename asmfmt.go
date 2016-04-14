@@ -77,13 +77,19 @@ func (f *fstate) addLine(b []byte) error {
 			ends := strings.Index(s, "*/")
 			end := strings.TrimSpace(s[:ends])
 			if f.lastStar {
-				end = end + " */\n"
+				end = end + " */"
 			} else {
-				end = end + "*/\n"
+				end = end + "*/"
 			}
-			f.out.WriteString(end)
 			f.insideBlock = false
 			s = strings.TrimSpace(s[ends+2:])
+			if strings.HasSuffix(s, "\\") {
+				end = end + " \\"
+				if len(s) == 1 {
+					s = ""
+				}
+			}
+			f.out.WriteString(end+"\n")
 			if len(s) == 0 {
 				return nil
 			}
