@@ -44,6 +44,8 @@ Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler fil
 
 # updates
 
+* Apr 14, 2016: Fix end of multiline comments in macro definitions.
+* Apr 14, 1016: Updated tools to Go 1.5+
 * Dec 21, 2015: Space before semi-colons in macro definitions is now trimmed.
 * Dec 21, 2015: Fix line comments in macro definitions (only valid with Go 1.5).
 * Dec 17, 2015: Comments are better aligned to the following section.
