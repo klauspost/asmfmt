@@ -103,7 +103,7 @@ You should only run `asmfmt` on files that are assembler files. Assembler files 
 * Line comments have a space after `//`, except if comment starts with `+`.
 * There is always a space between parameters.
 * Macros in the same file are tracked, and not included in parameter indentation.
-* `TEXT`, `DATA` and `GLOBL` and labels are level 0 indentation.
+* `TEXT`, `DATA` and `GLOBL`, `FUNCDATA`, `PCDATA` and labels are level 0 indentation.
 * Aligns `\` in multiline macros.
 * Whitespace before separating `;` is removed. Space is inserted after, if followed by another instruction.
 
