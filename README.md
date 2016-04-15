@@ -95,6 +95,7 @@ You should only run `asmfmt` on files that are assembler files. Assembler files 
 * It will align the first parameter.
 * It will align all comments in a block.
 * It will eliminate multiple blank lines.
+* Removes `;` at end of line.
 * Forced newline before comments, except when preceded by label or another comment.
 * Forced newline before labels, except when preceded by comment.
 * Labels are on a separate lines, except for comments.
