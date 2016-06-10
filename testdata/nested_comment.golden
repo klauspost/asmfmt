@@ -5,14 +5,14 @@ TEXT ·FailsFormatting(SB), NOSPLIT, $0
 
 TEXT ·FailsFormatting(SB), NOSPLIT, $0
 /*
-RET // */
+        RET //*/
 
 TEXT ·FailsFormatting(SB), NOSPLIT, $0
 	RET // Some longer comment*/
 
 TEXT ·FailsFormatting(SB), NOSPLIT, $0
 /*
-RET // Some longer comment */
+        RET // Some longer comment*/
 
 TEXT ·FailsFormatting(SB), NOSPLIT, $0
 	/*        RET // */

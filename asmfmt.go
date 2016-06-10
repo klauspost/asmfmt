@@ -74,12 +74,11 @@ func (f *fstate) addLine(b []byte) error {
 		}()
 		if strings.Contains(s, "*/") {
 			ends := strings.Index(s, "*/")
-			end := strings.TrimSpace(s[:ends])
-			if f.lastStar {
-				end = end + " */"
-			} else {
-				end = end + "*/"
+			end := s[:ends]
+			if strings.HasPrefix(strings.TrimSpace(s), "*") && f.lastStar {
+				end = strings.TrimSpace(end) + " "
 			}
+			end = end + "*/"
 			f.insideBlock = false
 			s = strings.TrimSpace(s[ends+2:])
 			if strings.HasSuffix(s, "\\") {
