@@ -1,7 +1,7 @@
 /*
 Quicker way of loading MOD_P ?
-MOVL    $-1, R8
-NEGQ    R8
+        MOVL    $-1, R8
+        NEGQ    R8
 */
 #define MOD_P 0xFFFFFFFF00000001
 
