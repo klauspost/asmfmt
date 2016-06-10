@@ -67,7 +67,6 @@ func (f *fstate) addLine(b []byte) error {
 		return fmt.Errorf("zero (0) byte in input. file is unlikely an assembler file")
 	}
 	s := string(b)
-	s = strings.TrimSpace(s)
 	// Inside block comment
 	if f.insideBlock {
 		defer func() {
@@ -95,7 +94,8 @@ func (f *fstate) addLine(b []byte) error {
 			}
 		} else {
 			// Insert a space on lines that begin with '*'
-			if strings.HasPrefix(s, "*") {
+			if strings.HasPrefix(strings.TrimSpace(s), "*") {
+				s = strings.TrimSpace(s)
 				f.out.WriteByte(' ')
 				f.lastStar = true
 			} else {
@@ -105,6 +105,7 @@ func (f *fstate) addLine(b []byte) error {
 			return nil
 		}
 	}
+	s = strings.TrimSpace(s)
 
 	// Comment is the the only line content.
 	if strings.HasPrefix(s, "//") {
@@ -141,6 +142,15 @@ func (f *fstate) addLine(b []byte) error {
 	if strings.Contains(s, "/*") && !strings.HasSuffix(s, `\`) {
 		starts := strings.Index(s, "/*")
 		ends := strings.Index(s, "*/")
+		lineComment := strings.Index(s, "//")
+		if lineComment >= 0 {
+			if lineComment < starts {
+				goto exitcomm
+			}
+			if lineComment < ends && !f.insideBlock {
+				goto exitcomm
+			}
+		}
 		pre := s[:starts]
 		pre = strings.TrimSpace(pre)
 
