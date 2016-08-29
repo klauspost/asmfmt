@@ -44,6 +44,7 @@ Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler fil
 
 # updates
 
+* Aug 8, 2016: Don't indent comments before non-indented instruction.
 * Jun 10, 2016: Fixed crash with end-of-line comments that contained an end-of-block `/*` part.
 * Apr 14, 2016: Fix end of multiline comments in macro definitions.
 * Apr 14, 2016: Updated tools to Go 1.5+

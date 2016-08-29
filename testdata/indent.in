@@ -9,3 +9,19 @@ TEXT ·crc32sse(SB), 7, $0
 	RET// RET is a terminator
 
 	// This comment is at level 0, because it is following a terminator
+
+
+ TEXT ·addVV(SB), NOSPLIT, $0
+        BR ·addVV_g(SB)
+
+// func subVV(z, x, y []Word) (c Word)
+// z[i] = x[i] - y[i] for all i, carrying
+ TEXT ·subVV(SB), NOSPLIT, $0
+        MOVD z_len+8(FP), R7
+        MOVD x+24(FP), R8
+// func subVV(z, x, y []Word) (c Word)
+// z[i] = x[i] - y[i] for all i, carrying
+ TEXT ·subVV(SB), NOSPLIT, $0
+// func subVV(z, x, y []Word) (c Word)
+        MOVD z_len+8(FP), R7
+        MOVD x+24(FP), R8
