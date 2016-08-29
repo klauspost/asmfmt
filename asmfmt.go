@@ -252,7 +252,6 @@ exitcomm:
 	// Should this line be at level 0?
 	if st.level0() && !(st.continued && f.lastContinued) {
 		if st.isTEXT() && len(f.queued) == 0 && len(f.comments) > 0 {
-			//f.out.WriteString(fmt.Sprintf("// len: %d\n", len(f.comments)))
 			f.indentation = 0
 		}
 		f.flush()
