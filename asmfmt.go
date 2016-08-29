@@ -62,6 +62,10 @@ type statement struct {
 }
 
 // Add a new input line.
+// Since you are looking at ths code:
+// This code has grown over a considerable amount of time,
+// and deserves a rewrite with proper parsing instead of this hodgepodge.
+// Its output is stable, and could be used as reference for a rewrite.
 func (f *fstate) addLine(b []byte) error {
 	if bytes.Contains(b, []byte{0}) {
 		return fmt.Errorf("zero (0) byte in input. file is unlikely an assembler file")
@@ -116,9 +120,13 @@ func (f *fstate) addLine(b []byte) error {
 		}()
 
 		s = strings.TrimPrefix(s, "//")
-
-		f.flush()
-		f.newLine()
+		if len(f.queued) > 0 {
+			f.flush()
+		}
+		// Newline before comments
+		if len(f.comments) == 0 {
+			f.newLine()
+		}
 
 		// Preserve whitespace if the first character after the comment
 		// is a whitespace
@@ -243,6 +251,9 @@ exitcomm:
 
 	// Should this line be at level 0?
 	if st.level0() && !(st.continued && f.lastContinued) {
+		if st.isTEXT() && len(f.queued) == 0 && len(f.comments) > 0 {
+			f.indentation = 0
+		}
 		f.flush()
 
 		// Add newline before jump target.
@@ -534,7 +545,7 @@ func (st *statement) cleanParams() {
 // Comments and line-continuation (\) are aligned with spaces.
 func formatStatements(s []statement) []string {
 	res := make([]string, len(s))
-	maxParam := 0 // Lenght of longest parameter
+	maxParam := 0 // Length of longest parameter
 	maxInstr := 0 // Length of longest instruction WITH parameters.
 	maxAlone := 0 // Length of longest instruction without parameters.
 	for i, x := range s {
