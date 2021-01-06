@@ -1,16 +1,17 @@
 language: go
 
-sudo: false
-
 os:
   - linux
   - osx
 
 go:
-  - 1.9.x
-  - 1.10.x
-  - 1.11.x
+  - 1.13.x
+  - 1.14.x
+  - 1.15.x
   - master
+
+env:
+  - GO111MODULE=off
 
 install:
  - go get ./...
@@ -23,8 +24,8 @@ script:
  - diff <(golint ./...) <(printf "")
  - go test -v -cpu=2 ./...
  - go test -v -cpu=1,2,4 -short -race ./...
- 
+
 matrix:
   allow_failures:
     - go: 'master'
-  fast_finish: true 
+  fast_finish: true
