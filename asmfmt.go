@@ -157,6 +157,12 @@ func (f *fstate) addLine(b []byte) error {
 			if lineComment < ends && !f.insideBlock {
 				goto exitcomm
 			}
+			if ends > starts && ends < lineComment {
+				// If there is something left between the end and the line comment, keep it.
+				if len(strings.TrimSpace(s[ends:lineComment])) > 0 {
+					goto exitcomm
+				}
+			}
 		}
 		pre := s[:starts]
 		pre = strings.TrimSpace(pre)

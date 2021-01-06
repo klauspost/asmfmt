@@ -13,8 +13,9 @@ import (
 
 var update = flag.Bool("update", false, "update .golden files")
 
-func init() {
+func TestMain(m *testing.M) {
 	flag.Parse()
+	os.Exit(m.Run())
 }
 
 func runTest(t *testing.T, in, out string) {
