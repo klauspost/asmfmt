@@ -7,10 +7,8 @@ Read Introduction: [asmfmt: Go Assembler Formatter](https://blog.klauspost.com/a
 
 [![Build Status](https://travis-ci.org/klauspost/asmfmt.svg?branch=master)](https://travis-ci.org/klauspost/asmfmt)
 [![Windows Build](https://ci.appveyor.com/api/projects/status/s729ayhkqkjf0ye6/branch/master?svg=true)](https://ci.appveyor.com/project/klauspost/asmfmt/branch/master)
-[![GoDoc][1]][2]
+[![Go Reference](https://pkg.go.dev/badge/klauspost/asmfmt.svg)](https://pkg.go.dev/klauspost/asmfmt)
 
-[1]: https://godoc.org/github.com/klauspost/asmfmt?status.svg
-[2]: https://godoc.org/github.com/klauspost/asmfmt
 
 See [Example 1](https://files.klauspost.com/diff.html), [Example 2](https://files.klauspost.com/diff2.html), [Example 3](https://files.klauspost.com/diff3.html), or compare files in the [testdata folder](https://github.com/klauspost/asmfmt/tree/master/testdata).
 
@@ -44,6 +42,7 @@ Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler fil
 
 # updates
 
+* Jan 6, 2021: Fix C comments before line comments like `VPCMPEQB Y8/*(DI)*/, Y0, Y1 // comment...`
 * Aug 8, 2016: Don't indent comments before non-indented instruction.
 * Jun 10, 2016: Fixed crash with end-of-line comments that contained an end-of-block `/*` part.
 * Apr 14, 2016: Fix end of multiline comments in macro definitions.
