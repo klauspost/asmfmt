@@ -12,12 +12,7 @@ import (
 // Format the input and return the formatted data.
 // If any error is encountered, no data will be returned.
 func Format(in io.Reader) ([]byte, error) {
-	var src *bufio.Reader
-	var ok bool
-	src, ok = in.(*bufio.Reader)
-	if !ok {
-		src = bufio.NewReader(in)
-	}
+	src := bufio.NewReaderSize(in, 512<<10)
 	dst := &bytes.Buffer{}
 	state := fstate{out: dst, defines: make(map[string]struct{})}
 	for {
