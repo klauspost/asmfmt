@@ -16,8 +16,9 @@ Status: STABLE. The format will only change if bugs are found. Please report any
 
 # install
 
-To install the standalone formatter,
-`go get -u github.com/klauspost/asmfmt/cmd/asmfmt`
+Binaries can be downloaded from [Releases](https://github.com/klauspost/asmfmt/releases). Unpack the file into your executable path.
+
+To install the standalone formatter from source using Go framework: `go get -u github.com/klauspost/asmfmt/cmd/asmfmt`.
 
 # updates
 
