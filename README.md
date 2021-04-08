@@ -19,29 +19,9 @@ Status: STABLE. The format will only change if bugs are found. Please report any
 To install the standalone formatter,
 `go get -u github.com/klauspost/asmfmt/cmd/asmfmt`
 
-There are also replacements for `gofmt`, `goimports` and `goreturns`, which will process `.s` files alongside your go files when formatting a package.
-
-You can choose which to install:
-```
-go get -u github.com/klauspost/asmfmt/cmd/gofmt/...
-go get -u github.com/klauspost/asmfmt/cmd/goimports/...
-go get -u github.com/klauspost/asmfmt/cmd/goreturns/...
-```
-
-Note that these require **Go 1.5** due to changes in import paths.
-
-To test if the modified version is used, use `goimports -help`, and the output should look like this:
-
-```
-usage: goimports [flags] [path ...]
-    [flags]
-(this version includes asmfmt)
-```
-
-Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler files as well.
-
 # updates
 
+* Apr 8, 2021: Add modules info and remove other than main tools. 
 * Jan 6, 2021: Fix C comments before line comments like `VPCMPEQB Y8/*(DI)*/, Y0, Y1 // comment...`
 * Aug 8, 2016: Don't indent comments before non-indented instruction.
 * Jun 10, 2016: Fixed crash with end-of-line comments that contained an end-of-block `/*` part.
@@ -51,6 +31,26 @@ Using `gofmt -w mypackage` will Gofmt your Go files and format all assembler fil
 * Dec 21, 2015: Fix line comments in macro definitions (only valid with Go 1.5).
 * Dec 17, 2015: Comments are better aligned to the following section.
 * Dec 17, 2015: Clean semi-colons in multiple instruction per line.
+
+# goland
+
+To set up a custom File Watcher in Goland, 
+
+* Go to Settings -> Tools -> File Watchers
+* Press **+** and choose `<custom>` template.
+* Name it `asmfmt`
+* File Type, Select `x86 Plan 9 Assembly file` (it will apply to all platforms)
+* Scope: `Project Files`
+* Arguments: `$FilePath$`.
+* Output Paths to Refresh: `$FilePath$`
+* Working Directory: `$ProjectFileDir$`
+
+Advanced options, Enable:
+
+* [x] Trigger the watcher regardless of syntax errors (IMPORTANT) 
+* [x] Create output file from stdout
+
+Disable the rest.
 
 # emacs
 
