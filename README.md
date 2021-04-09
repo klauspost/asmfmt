@@ -53,6 +53,9 @@ Advanced options, Enable:
 
 Disable the rest.
 
+![Goland Configuration](https://user-images.githubusercontent.com/5663952/114158973-96eebc80-9925-11eb-9aea-703ce474a7bb.png)
+
+
 # emacs
 
 To automatically format assembler, in `.emacs` add:
