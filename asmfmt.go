@@ -127,7 +127,7 @@ func (f *fstate) addLine(b []byte) error {
 		// is a whitespace
 		ts := strings.TrimSpace(s)
 		var q string
-		if (ts != s && len(ts) > 0) || (len(s) > 0 && strings.ContainsAny(string(s[0]), `+/`)) {
+		if (ts != s && len(ts) > 0) || (len(s) > 0 && strings.ContainsAny(string(s[0]), `+/`)) || (len(s) >= 8 && s[:8] == "go:build") {
 			q = fmt.Sprint("//" + s)
 		} else if len(ts) > 0 {
 			// Insert a space before the comment
