@@ -42,6 +42,7 @@ type fstate struct {
 	lastLabel     bool
 	anyContents   bool
 	lastContinued bool // Last line continued
+	lastAlign     bool
 	queued        []statement
 	comments      []string
 	defines       map[string]struct{}
@@ -112,6 +113,7 @@ func (f *fstate) addLine(b []byte) error {
 			f.anyContents = true
 			f.lastEmpty = false
 			f.lastStar = false
+			f.lastAlign = false
 		}()
 
 		s = strings.TrimPrefix(s, "//")
@@ -211,7 +213,7 @@ exitcomm:
 
 		// No more than two empty lines in a row
 		// cannot start with NL
-		if f.lastEmpty || !f.anyContents {
+		if f.lastEmpty || !f.anyContents || f.lastAlign {
 			return nil
 		}
 		if f.lastContinued {
@@ -242,6 +244,9 @@ exitcomm:
 			return fmt.Errorf("package instruction found. Go files are not supported")
 		}
 	}
+	defer func(b bool) {
+		f.lastAlign = b
+	}(st.isALIGN() && !st.isPreProcessor())
 
 	// Move anything that isn't a comment to the next line
 	if st.isLabel() && len(st.params) > 0 && !st.continued {
@@ -257,8 +262,10 @@ exitcomm:
 		}
 		f.flush()
 
-		// Add newline before jump target.
-		f.newLine()
+		if !f.lastAlign {
+			// Add newline before jump target if not previous was alignment.
+			f.newLine()
+		}
 
 		f.indentation = 0
 		f.queued = append(f.queued, *st)
@@ -313,7 +320,7 @@ func (f *fstate) flush() {
 // Add a newline, unless last line was empty or a comment
 func (f *fstate) newLine() {
 	// Always newline before comment-only line.
-	if !f.lastEmpty && !f.lastComment && !f.lastLabel && f.anyContents {
+	if !f.lastEmpty && !f.lastComment && !f.lastLabel && f.anyContents && !f.lastAlign {
 		f.out.WriteByte('\n')
 	}
 }
@@ -481,7 +488,18 @@ func (st statement) isPreProcessor() bool {
 func (st statement) isGlobal() bool {
 	up := strings.ToUpper(st.instruction)
 	switch up {
-	case "DATA", "GLOBL", "FUNCDATA", "PCDATA":
+	case "DATA", "GLOBL", "FUNCDATA", "PCDATA", "PCALIGN":
+		return true
+	default:
+		return false
+	}
+}
+
+// isALIGN returns true if the current instruction is
+// an alignment instruction.
+func (st statement) isALIGN() bool {
+	switch strings.ToUpper(st.instruction) {
+	case "PCALIGN":
 		return true
 	default:
 		return false
