@@ -5,8 +5,6 @@ This will format your assembler code in a similar way that `gofmt` formats your 
 
 Read Introduction: [asmfmt: Go Assembler Formatter](https://blog.klauspost.com/asmfmt-assembler-formatter/)
 
-[![Build Status](https://travis-ci.com/klauspost/asmfmt.svg?branch=master)](https://travis-ci.com/klauspost/asmfmt)
-[![Windows Build](https://ci.appveyor.com/api/projects/status/s729ayhkqkjf0ye6/branch/master?svg=true)](https://ci.appveyor.com/project/klauspost/asmfmt/branch/master)
 [![Go Reference](https://pkg.go.dev/badge/klauspost/asmfmt.svg)](https://pkg.go.dev/klauspost/asmfmt)
 
 
