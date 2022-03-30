@@ -325,7 +325,18 @@ func newStatement(s string, defs map[string]struct{}) *statement {
 	st := statement{}
 
 	// Fix where a comment start if any
+	// We need to make sure that the comment isn't embedded in a string literal
 	startcom := strings.Index(s, "//")
+	startstr := strings.Index(s, "\"")
+	for endstr := 0; startcom > startstr && startstr > endstr; {
+		// This does not check for any escaping (i.e. "\"")
+		endstr = startstr + 1 + strings.Index(s[startstr+1:], "\"")
+		startcom = endstr + strings.Index(s[endstr:], "//")
+		if startcom < endstr {
+			startcom = 0
+		}
+		startstr = endstr + 1 + strings.Index(s[endstr+1:], "\"")
+	}
 	if startcom > 0 {
 		st.comment = strings.TrimSpace(s[startcom+2:])
 		s = strings.TrimSpace(s[:startcom])
@@ -417,11 +428,25 @@ func (st *statement) setParams(s string) {
 	runes := []rune(s)
 	last := '\n'
 	inComment := false
+	inStringLiteral := false
+	inCharLiteral := false
 	out := make([]rune, 0, len(runes))
 	for _, r := range runes {
 		switch r {
+		case '"':
+			if last != '\\' && inStringLiteral {
+				inStringLiteral = false
+			} else if last != '\\' && !inStringLiteral {
+				inStringLiteral = true
+			}
+		case '\'':
+			if last != '\\' && inCharLiteral {
+				inCharLiteral = false
+			} else if last != '\\' && !inCharLiteral {
+				inCharLiteral = true
+			}
 		case ',':
-			if inComment {
+			if inComment || inStringLiteral || inCharLiteral {
 				break
 			}
 			c := strings.TrimSpace(string(out))
@@ -443,11 +468,12 @@ func (st *statement) setParams(s string) {
 				r = ' '
 			}
 		case ';':
-			if !inComment {
-				out = []rune(strings.TrimSpace(string(out)) + "; ")
-				last = r
-				continue
+			if inComment || inStringLiteral || inCharLiteral {
+				break
 			}
+			out = []rune(strings.TrimSpace(string(out)) + "; ")
+			last = r
+			continue
 		}
 		if last == ';' && unicode.IsSpace(r) {
 			continue
