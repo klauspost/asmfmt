@@ -20,6 +20,7 @@ To install the standalone formatter from source using Go framework: `go install 
 
 # updates
 
+* Jan 28, 2022: Add `PCALIGN` as special global indentation check that sticks to the label.
 * Apr 8, 2021: Add modules info and remove other than main tools. 
 * Jan 6, 2021: Fix C comments before line comments like `VPCMPEQB Y8/*(DI)*/, Y0, Y1 // comment...`
 * Aug 8, 2016: Don't indent comments before non-indented instruction.
@@ -108,6 +109,7 @@ You should only run `asmfmt` on files that are assembler files. Assembler files 
 * There is always a space between parameters.
 * Macros in the same file are tracked, and not included in parameter indentation.
 * `TEXT`, `DATA` and `GLOBL`, `FUNCDATA`, `PCDATA` and labels are level 0 indentation.
+* `PCALIGN` sticks to the label and is kept to the left as a global.
 * Aligns `\` in multiline macros.
 * Whitespace before separating `;` is removed. Space is inserted after, if followed by another instruction.
 
